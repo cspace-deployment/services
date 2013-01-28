@@ -8,7 +8,7 @@
     <!-- enviornment should be declared before reading build.properties -->
     <property environment="env" />
     <property file="${services.trunk}/build.properties" />
-    <property name="mvn.opts" value="" />
+    <property name="mvn.opts" value="-V" />
     <property name="src" location="src"/>
 
     <condition property="osfamily-unix">
@@ -111,21 +111,29 @@
     <target name="deploy" depends="install"
     description="deploy organization in ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-anthropology/build.xml" target="deploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-pahma/build.xml" target="deploy" inheritall="false"/>
     </target>
 
     <target name="undeploy"
     description="undeploy organization from ${jee.server.nuxeo}">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-anthropology/build.xml" target="undeploy" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-pahma/build.xml" target="undeploy" inheritall="false"/>
     </target>
 
     <target name="dist"
     description="generate distribution for organization" depends="package">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-anthropology/build.xml" target="dist" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-pahma/build.xml" target="dist" inheritall="false"/>
     </target>
     
     <target name="dist_installer"
     description="generate distribution for collectionobject" depends="package">
         <ant antfile="nuxeo-platform-cs-organization/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-anthropology/build.xml" target="dist_installer" inheritall="false"/>
+        <ant antfile="nuxeo-platform-organization-pahma/build.xml" target="dist_installer" inheritall="false"/>
     </target>
 
 </project>
