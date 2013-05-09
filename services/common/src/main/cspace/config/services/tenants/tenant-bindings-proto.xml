@@ -1032,7 +1032,7 @@
             <service:properties xmlns:service="http://collectionspace.org/services/config/service">
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNameProperty</types:key>
-                    <types:value>currentOwner</types:value>
+                    <types:value>depositor</types:value>
                 </types:item>
                 <types:item xmlns:types="http://collectionspace.org/services/config/types">
                     <types:key>objectNumberProperty</types:key>
