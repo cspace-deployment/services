@@ -1106,6 +1106,15 @@
   "3/4/2000?":                           # oneDisplayDate - with question mark
                                          earliestSingleDate: [2000,  3,  4, CE]
 
+  "13 Apr 2015":                         #D/M/Y'
+                                         earliestSingleDate: [2015, 4,  13, CE]
+  
+  "14 Jan 1995":                         # More D/M/Y
+                                         earliestSingleDate: [1995, 1,  14, CE]
+
+  "29 oct 2914":
+                                         earliestSingleDate: [2914, 10, 29, CE]
+
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
@@ -1147,4 +1156,16 @@
                                          null
 
   '3/4?/2005':                           # question mark
+                                         null
+
+  'January 100th 2018':                  # invalid day
+                                         null
+
+  'APRIL 88 2018':                      # invalid day
+                                         null
+  
+  '08/08/2004 - 13/13/2005':            # day out of range
+                                         null
+
+  '15/03/1995':
                                          null

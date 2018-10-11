@@ -389,6 +389,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// since the UI doesn't care. Use a copy of the earliest date, since it makes
 		// things easier here if we don't have to test for null up the tree.
 
+		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
+			return;
+		}
+
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 	}
@@ -430,26 +434,75 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
 		stack.push(era);
+
+		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
+			throw new StructuredDateFormatException("This resulted in an invalid date: "    +
+													" Year :"  + Integer.toString(year)     +
+													" Month: " + Integer.toString(numMonth) +
+												    " Day: "   + Integer.toString(dayOfMonth));
+		}
 	}
 
 	@Override
 	public void exitStrDate(StrDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		// Reorder the stack into a canonical ordering,
-		// year-month-day-era.
+		/* The Era can now be at the end or the beginning of the stack. 
+			This will help us distinguish whether we expect a year or a day/month after */
+		boolean eraLast = stack.peek() instanceof Integer;
+		int dayOfMonth;
+		Era era;
 
-		Era era = (Era) stack.pop();
-		Integer year = (Integer) stack.pop();
-		Integer dayOfMonth = (Integer) stack.pop();
-		Integer numMonth = (Integer) stack.pop();
+		/* Originally, the addition to the grammar made it impossible to distinguish
+		   between dates such as May 1 2010 and January 5 2010 if the stack contained
+		   [05 01 2010] since day/month could go in either position, so we use the context
+		   to obtain the month number accurately, as well as retrieve the day of the month
+		   whether it be in an nth (ordinal) format or decimal */
+		int numMonth = DateUtils.getMonthByName(ctx.strMonth().start.getText());
+		int year = Integer.parseInt(ctx.numYear().getText());
+		if (ctx.nth() != null) {
+			dayOfMonth = DateUtils.getNthDayOfMonth(ctx.nth().getText());
+		} else {
+			dayOfMonth = Integer.parseInt(ctx.numDayOfMonth().getText());
+		}
+
+		/*  Pop the stack since we need to empty it and will instead use the context info to
+			push values back in */ 
+		if (eraLast) {
+			stack.pop(); stack.pop(); stack.pop();
+			era = (Era) stack.pop();
+		} else {
+			era = (Era) stack.pop();
+			stack.pop(); stack.pop(); stack.pop();
+			
+			/* Need to decide which of the formats, DD-MM-YY or YY-MM-DD
+			   are the one we want */
+			int num1 = year;
+			int num2 = numMonth;
+			int num3 = dayOfMonth;
+			dayOfMonth = num3;
+
+			if (DateUtils.isValidDate(num1, num2, num3, era)) {
+				/* Do nothing, the format is right (YY-MM-DD) */
+			} else if (DateUtils.isValidDate(num3, num2, num1, era)) {
+				/* The format is DD-MM-YY so we need to rearrange things  */
+				year = num3;
+				dayOfMonth = num1;
+			}
+		}
 
 		stack.push(year);
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
 		stack.push(era);
-	}
 
+		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
+			throw new StructuredDateFormatException("This resulted in an invalid date: "   +
+													"Year :"  + Integer.toString(year)     +
+													"Month: " + Integer.toString(numMonth) +
+												    "Day: "   + Integer.toString(dayOfMonth));
+		}
+	}
 	@Override
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
@@ -475,6 +528,10 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Era era = (Era) stack.pop();
 		Integer year = (Integer) stack.pop();
 		Integer numMonth = (Integer) stack.pop();
+
+		if (numMonth < 1 || numMonth > 12) {
+			throw new StructuredDateFormatException("unexpected month '" + numMonth + "'");
+		}
 
 		stack.push(new Date(year, numMonth, 1, era));
 		stack.push(new Date(year, numMonth, DateUtils.getDaysInMonth(numMonth, year, era), era));
@@ -1022,9 +1079,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Integer dayOfMonth = new Integer(ctx.NUMBER().getText());
 
+		/* Got rid of this exception, and now check higher up on the tree instead
+
 		if (dayOfMonth == 0 || dayOfMonth > 31) {
 			throw new StructuredDateFormatException("unexpected day of month '" + ctx.NUMBER().getText() + "'");
 		}
+
+		*/
 
 		stack.push(dayOfMonth);
 	}
