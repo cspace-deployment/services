@@ -385,9 +385,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
 
-
-
-
 		// For the latest date we could either return null, or a copy of the earliest date,
 		// since the UI doesn't care. Use a copy of the earliest date, since it makes
 		// things easier here if we don't have to test for null up the tree.
@@ -395,7 +392,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
 			return;
 		}
-
 
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
 		stack.push(new Date(year, numMonth, dayOfMonth, era));
@@ -511,29 +507,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	public void exitInvStrDate(InvStrDateContext ctx) {
 		if (ctx.exception != null) return;
 
-		// Must take day-month-year into account now but default to year-month-day-era
-		Integer num1 = (Integer) stack.pop();
-		Integer num2 = (Integer) stack.pop(); 
-		Integer num3 = (Integer) stack.pop();
+		// Reorder the stack into a canonical ordering,
+		// year-month-day-era.
+
+		Integer dayOfMonth = (Integer) stack.pop();
+		Integer numMonth = (Integer) stack.pop();
+		Integer year = (Integer) stack.pop();
 		Era era = (Era) stack.pop();
-
-		
-		// Default is DD-MM-YYY
-		int dayOfMonth = num1;
-		int numMonth = num2;
-		int year = num3;
-
-
-		if (DateUtils.isValidDate(num3, num2, num1, era)) {
-			// The default is year-month-day-era, so we can keep it
-		} else if (DateUtils.isValidDate(num1, num2, num3, era)) {
-			// Then we have a day-month-year-era, so we switch things around
-			dayOfMonth = num3;
-			year = num1;
-		}
-
-
-
 
 		stack.push(year);
 		stack.push(numMonth);
@@ -560,6 +540,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitInvMonthYear(InvMonthYearContext ctx) {
 		if (ctx.exception != null) return;
+
+		// Invert the arguments.
 
 		Integer numMonth = (Integer) stack.pop();
 		Integer year = (Integer) stack.pop();
@@ -1097,7 +1079,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 		Integer dayOfMonth = new Integer(ctx.NUMBER().getText());
 
-		/* Got rid of this exception, and now check higher up on the tree instead */
+		/* Got rid of this exception, and now check higher up on the tree instead
+
+		if (dayOfMonth == 0 || dayOfMonth > 31) {
+			throw new StructuredDateFormatException("unexpected day of month '" + ctx.NUMBER().getText() + "'");
+		}
+
+		*/
 
 		stack.push(dayOfMonth);
 	}
