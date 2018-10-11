@@ -1161,5 +1161,15 @@
   'January 100th 2018':                  # invalid day
                                          null
 
-  'APRIL 88 2018':                  # invalid day
+  'APRIL 88 2018':                      # invalid day
                                          null
+  
+  '08/08/2004 - 13/13/2005':            # day out of range
+                                         null
+
+  '15/03/1995':
+                                         null
+
+
+  # MDY
+  # YMD

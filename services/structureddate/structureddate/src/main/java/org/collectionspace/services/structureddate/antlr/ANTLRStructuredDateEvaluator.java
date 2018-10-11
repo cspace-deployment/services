@@ -393,7 +393,7 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		// things easier here if we don't have to test for null up the tree.
 
 		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
-			throw new StructuredDateFormatException("This resulted in an invalid date");		
+			return;
 		}
 
 
@@ -438,6 +438,13 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(numMonth);
 		stack.push(dayOfMonth);
 		stack.push(era);
+
+		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
+			throw new StructuredDateFormatException("This resulted in an invalid date: "    +
+													" Year :"  + Integer.toString(year)     +
+													" Month: " + Integer.toString(numMonth) +
+												    " Day: "   + Integer.toString(dayOfMonth));
+		}
 	}
 
 	@Override
@@ -493,14 +500,11 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		stack.push(dayOfMonth);
 		stack.push(era);
 
-		if (numMonth > 12 || numMonth <= 0) {
-			throw new StructuredDateFormatException("Unexpected number of month " + Integer.toString(numMonth) + ".");
-		} else if (dayOfMonth <= 0 || dayOfMonth >= 32) {
-			throw new StructuredDateFormatException("Unexpected day of month "    + Integer.toString(dayOfMonth) + ".");
-		}
-
 		if (!DateUtils.isValidDate(year, numMonth, dayOfMonth, era)) {
-			throw new StructuredDateFormatException("This resulted in an invalid date");		
+			throw new StructuredDateFormatException("This resulted in an invalid date: "   +
+													"Year :"  + Integer.toString(year)     +
+													"Month: " + Integer.toString(numMonth) +
+												    "Day: "   + Integer.toString(dayOfMonth));
 		}
 	}
 	@Override
