@@ -1163,7 +1163,6 @@
                                          earliestSingleDate: []
                                          latestDate:         [2017,  6, 10, CE]
 
-
   "after 13 april 1995":                # beforeAfterDate - Empty latestDate calculated as current date - Day Month Year Format
                                          earliestSingleDate: [1995,  4, 13, CE]
                                          latestDate:         "current date"
@@ -1197,6 +1196,25 @@
   '04/1996-07/09':                       # Semi-ambigious NumDayInMonthRange - should be interpreted as Month/Year - Month/Year date
                                          earliestSingleDate: [1996,  4,  1, CE]
                                          latestDate:         [9,     7, 31, CE] 
+  "1200±50 BP":                          # Uncalibrated date with ± symbol, with CE
+                                         earliestSingleDate: [768,  1, 1, CE]
+                                         latestDate:         [868,  12, 31, CE]
+
+  "3100 +/- 150 BP":                    # Uncalibrated date with +/- instead of ± symbol
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
+  "3100+/-150 BP":                      # Uncalibrated date with +/- instead of ± symbol, no spaces
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
+  "3100+/-150 years BP":                 # Uncalibrated date with 'years' in it
+                                         earliestSingleDate: [1232,  1, 1, BCE]
+                                         latestDate:         [932,  12, 31, BCE]
+
+  "2000±100 BP":                         # Uncalibrated date with BCE and AD mix
+                                         earliestSingleDate: [82,  1, 1, BCE]
+                                         latestDate:         [118,  12, 31, CE]
 # -------------------------------------------------------------------------------------------------------
 # Invalid dates
 # -------------------------------------------------------------------------------------------------------
