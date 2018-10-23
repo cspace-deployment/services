@@ -1135,6 +1135,14 @@ public class DateUtils {
 		Integer year = (Integer) localDate.getYear();
 		Integer month = (Integer) localDate.getMonthOfYear();
 		Integer dayOfMonth = (Integer) localDate.getDayOfMonth();
+		return new Date(year, month, dayOfMonth, Date.DEFAULT_ERA);
+	}
+
+	public static Date getCurrentDate() {
+		LocalDate localDate = new LocalDate();
+		Integer year = (Integer) localDate.getYear();
+		Integer month = (Integer) localDate.getMonthOfYear();
+		Integer dayOfMonth = (Integer) localDate.getDayOfMonth();
 		Era era = (localDate.getEra() == DateTimeConstants.BC) ? Era.BCE : Era.CE;
 		return new Date(year, month, dayOfMonth, era);
 	}
