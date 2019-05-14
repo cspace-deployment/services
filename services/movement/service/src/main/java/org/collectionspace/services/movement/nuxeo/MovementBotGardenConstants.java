@@ -23,7 +23,7 @@ public class MovementBotGardenConstants {
 
 	public static final String DEAD_ACTION_CODE = "urn:cspace:botgarden.cspace.berkeley.edu:vocabularies:name(actionCode):item:name(actCode00)";
 	public static final String REVIVED_ACTION_CODE = "urn:cspace:botgarden.cspace.berkeley.edu:vocabularies:name(actionCode):item:name(actCode06)";
-	public static final String OTHER_ACTION_CODE = "urn:cspace:botgarden.cspace.berkeley.edu:vocabularies:name(actionCode):item:name(actCode05)";
+	public static final String OTHER_ACTION_CODE = "urn:cspace:botgarden.cspace.berkeley.edu:vocabularies:name(actionCode):item:name(actCode05)\'Other\'";
 
 	public static final String LABEL_REQUESTED_SCHEMA_NAME = BOTGARDEN_SCHEMA_NAME;
 	public static final String LABEL_REQUESTED_FIELD_NAME = "labelRequested";
