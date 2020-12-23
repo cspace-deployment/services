@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 6.6.0  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="pahmaRepatriationNAGPRA" pageWidth="792" pageHeight="612" orientation="Landscape" columnWidth="752" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6a323f2b-2e53-46d8-9c36-871f8f0ec232">
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Object CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="groupcsid" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Group CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Group CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="objcsids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : "'NOVALUE'"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+        coc.objectnumber AS objectNumber,
+        coalesce(utils.aggRepField(coc.id, 'collectionobjects_nagpra_nagprainventorynames', '|'), '%NULLVALUE%') AS nagpraInventoryNameRefname,
+        coalesce(utils.aggRepField(coc.id, 'collectionobjects_nagpra_nagpracategories', '|'), '%NULLVALUE%') AS nagpraCategoryRefname,
+        coalesce(utils.aggRepField(coc.id, 'collectionobjects_nagpra_graveassoccodes', '|'), '%NULLVALUE%') AS graveAssocCodeRefname,
+        coalesce(utils.aggRepField(coc.id, 'collectionobjects_nagpra_repatriationnotes', '|'), '%NULLVALUE%') AS repatriationNote,
+        coalesce(utils.aggRepField(coc.id, 'collectionobjects_nagpra_nagpraculturaldeterminations', '|'), '%NULLVALUE%') AS nagpraCulturalDetermination,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagpradetermgroup', 'nagpradetermculture', '|'), '%NULLVALUE%') AS nagpraDetermCultureRefname,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagpradetermgroup', 'nagpradetermtype', '|'), '%NULLVALUE%') AS nagpraDetermTypeRefname,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagpradetermgroup', 'nagpradetermby', '|'), '%NULLVALUE%') AS nagpraDetermByRefname,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagpradetermgroup', 'nagpradetermnote', '|'), '%NULLVALUE%') AS nagpraDetermNote,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagprareportfiledgroup', 'nagprareportfiled', '|'), '%NULLVALUE%') AS nagpraReportFiled,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagprareportfiledgroup', 'nagprareportfiledwith', '|'), '%NULLVALUE%') AS nagpraReportFiledWithRefname,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagprareportfiledgroup', 'nagprareportfiledby', '|'), '%NULLVALUE%') AS nagpraReportFiledByRefname,
+        coalesce(utils.aggRepDateField(coc.id, 'nagprareportfiledgroup', 'datedisplaydate', '|'), '%NULLVALUE%') AS nagpraReportFiledDate,
+        coalesce(utils.aggRepGroupField(coc.id, 'nagprareportfiledgroup', 'nagprareportfilednote', '|'), '%NULLVALUE%') AS nagpraReportFiledNote,
+        coalesce(utils.aggRepGroupField(coc.id, 'referencegroup', 'reference', '|'), '%NULLVALUE%') AS referenceGroup_referenceRefname,
+        coalesce(utils.aggRepGroupField(coc.id, 'referencegroup', 'referencenote', '|'), '%NULLVALUE%') AS referenceNote
+	FROM collectionobjects_common coc
+	JOIN hierarchy h on (coc.id = h.id)
+	WHERE h.name = $P{csid}
+	OR h.name IN (SELECT objectcsid
+   		FROM relations_common
+		WHERE subjectdocumenttype = 'Group' and objectdocumenttype = 'CollectionObject'
+		AND subjectcsid = $P{groupcsid})
+	OR h.name in ($P!{objcsids})]]>
+	</queryString>
+	<field name="objectNumber" class="java.lang.String"/>
+	<field name="nagpraInventoryNameRefname" class="java.lang.String"/>
+	<field name="nagpraCategoryRefname" class="java.lang.String"/>
+	<field name="graveAssocCodeRefname" class="java.lang.String"/>
+	<field name="repatriationNote" class="java.lang.String"/>
+	<field name="nagpraCulturalDetermination" class="java.lang.String"/>
+	<field name="nagpraDetermCultureRefname" class="java.lang.String"/>
+	<field name="nagpraDetermTypeRefname" class="java.lang.String"/>
+	<field name="nagpraDetermByRefname" class="java.lang.String"/>
+	<field name="nagpraDetermNote" class="java.lang.String"/>
+	<field name="nagpraReportFiled" class="java.lang.String"/>
+	<field name="nagpraReportFiledWithRefname" class="java.lang.String"/>
+	<field name="nagpraReportFiledByRefname" class="java.lang.String"/>
+	<field name="nagpraReportFiledDate" class="java.lang.String"/>
+	<field name="nagpraReportFiledNote" class="java.lang.String"/>
+	<field name="referenceGroup_referenceRefname" class="java.lang.String"/>
+	<field name="referenceNote" class="java.lang.String"/>
+	<columnHeader>
+		<band height="20">
+			<staticText>
+				<reportElement x="0" y="0" width="40" height="20" uuid="00c51817-97bb-4d5a-a2d1-ec6b4f147cd6"/>
+				<text><![CDATA[objectNumber]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="0" width="40" height="20" uuid="694c362f-804c-4ca0-955e-695a06259348"/>
+				<text><![CDATA[nagpraInventoryNameRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="80" y="0" width="40" height="20" uuid="40f2f8b3-e7d8-411a-913e-c8c41e11a3c3"/>
+				<text><![CDATA[nagpraCategoryRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="40" height="20" uuid="8c434f76-68dd-47b1-83b0-d497dc706180"/>
+				<text><![CDATA[graveAssocCodeRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="160" y="0" width="40" height="20" uuid="bd7a569e-601d-42ec-9c67-ec085b55af8a"/>
+				<text><![CDATA[repatriationNote]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="200" y="0" width="40" height="20" uuid="0b3ac1de-06bd-43f3-8065-4b37d2651918"/>
+				<text><![CDATA[nagpraCulturalDetermination]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="240" y="0" width="40" height="20" uuid="e38c8665-a53d-4266-97bd-2f10f6874470"/>
+				<text><![CDATA[nagpraDetermCultureRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="40" height="20" uuid="a566a5ba-014b-49fb-aabc-47e74f513333"/>
+				<text><![CDATA[nagpraDetermTypeRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="0" width="40" height="20" uuid="d6da8712-2369-46bf-a585-0aa8bc37e2ee"/>
+				<text><![CDATA[nagpraDetermByRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="360" y="0" width="40" height="20" uuid="690ecaea-717d-477d-9bb2-f01ceb070a79"/>
+				<text><![CDATA[nagpraDetermNote]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="400" y="0" width="40" height="20" uuid="aaa8e503-9bcb-467f-a01f-8e216051d21e"/>
+				<text><![CDATA[nagpraReportFiled]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="440" y="0" width="40" height="20" uuid="6d70f647-f74f-409b-b06b-47c8638d1188"/>
+				<text><![CDATA[nagpraReportFiledWithRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="40" height="20" uuid="654567f0-df5e-446d-874a-768358d5635e"/>
+				<text><![CDATA[nagpraReportFiledByRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="520" y="0" width="40" height="20" uuid="19460bdf-6783-46cb-a3df-683687ec7606"/>
+				<text><![CDATA[nagpraReportFiledDate]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="560" y="0" width="40" height="20" uuid="0e29cfcf-f052-451f-9f47-6562abcdd298"/>
+				<text><![CDATA[nagpraReportFiledNote]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="600" y="0" width="40" height="20" uuid="54962a4c-5a57-4aab-a396-b9ad26bfee6f"/>
+				<text><![CDATA[referenceGroup_referenceRefname]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="640" y="0" width="40" height="20" uuid="07021367-1572-4831-a781-00cd33e3f2cf"/>
+				<text><![CDATA[referenceNote]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20">
+			<textField>
+				<reportElement x="0" y="0" width="40" height="20" uuid="fe0bf036-3d96-4824-892d-9d073cc605e4"/>
+				<textFieldExpression><![CDATA[$F{objectNumber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="40" y="0" width="40" height="20" uuid="bba1ddca-da0e-4cb9-a084-6d9baba32b88"/>
+				<textFieldExpression><![CDATA[$F{nagpraInventoryNameRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="0" width="40" height="20" uuid="bb0ed6c3-29ac-406e-bc4d-3e2c44e76989"/>
+				<textFieldExpression><![CDATA[$F{nagpraCategoryRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="120" y="0" width="40" height="20" uuid="d9e9a1e3-8224-4adb-8045-2255bbf8b128"/>
+				<textFieldExpression><![CDATA[$F{graveAssocCodeRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="160" y="0" width="40" height="20" uuid="c1a85b94-f670-4997-ac74-1295b593ce2d"/>
+				<textFieldExpression><![CDATA[$F{repatriationNote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="0" width="40" height="20" uuid="a5af0b32-5b5c-4773-8a5d-057b5f34b001"/>
+				<textFieldExpression><![CDATA[$F{nagpraCulturalDetermination}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="240" y="0" width="40" height="20" uuid="7b1d1415-d17f-47ea-a30f-1a6c20342af2"/>
+				<textFieldExpression><![CDATA[$F{nagpraDetermCultureRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="40" height="20" uuid="33f69289-0362-408e-8b3c-72e40fdfb038"/>
+				<textFieldExpression><![CDATA[$F{nagpraDetermTypeRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="320" y="0" width="40" height="20" uuid="e4a95ddf-de25-464f-a7f2-80b25bafe308"/>
+				<textFieldExpression><![CDATA[$F{nagpraDetermByRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="360" y="0" width="40" height="20" uuid="260ef055-cbdb-44e2-90f4-55f647ce94ed"/>
+				<textFieldExpression><![CDATA[$F{nagpraDetermNote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="0" width="40" height="20" uuid="7f05d035-397d-439c-a8f7-2927cb534b74"/>
+				<textFieldExpression><![CDATA[$F{nagpraReportFiled}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="0" width="40" height="20" uuid="9abe40c6-390b-448e-a8c3-cbb6802c3590"/>
+				<textFieldExpression><![CDATA[$F{nagpraReportFiledWithRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="0" width="40" height="20" uuid="8cc82072-7fe0-47a1-bd6d-8a8277304fd2"/>
+				<textFieldExpression><![CDATA[$F{nagpraReportFiledByRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="520" y="0" width="40" height="20" uuid="a505412c-b126-4a97-ad16-eeddc3427af3"/>
+				<textFieldExpression><![CDATA[$F{nagpraReportFiledDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="560" y="0" width="40" height="20" uuid="220bfb90-70f0-4707-8829-291d104ecd69"/>
+				<textFieldExpression><![CDATA[$F{nagpraReportFiledNote}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="600" y="0" width="40" height="20" uuid="1838ba39-e9ee-47f2-a9a5-0cb0bd00efe5"/>
+				<textFieldExpression><![CDATA[$F{referenceGroup_referenceRefname}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="640" y="0" width="40" height="20" uuid="a51e4296-9899-4102-ae4a-5334501259bc"/>
+				<textFieldExpression><![CDATA[$F{referenceNote}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
+
