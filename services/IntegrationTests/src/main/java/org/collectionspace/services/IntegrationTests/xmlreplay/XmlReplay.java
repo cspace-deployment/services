@@ -638,6 +638,42 @@ public class XmlReplay {
                             expectedCodes.add(new Integer(code.trim()));
                         }
                     }
+                    //
+                    // Look to see if we need to pause before running the test.
+                    //
+                    long seconds = 0;
+                    String preDelaySecondsString = testNode.valueOf("@preDelaySeconds");
+                    if (Tools.notEmpty(preDelaySecondsString)) {
+                    	try {
+                    		seconds = Long.parseLong(preDelaySecondsString);
+                    	} catch (NumberFormatException nfe) {
+                            Map<String,String> vars = null;
+                            PartsStruct parts = PartsStruct.readParts(testNode, testID, xmlReplayBaseDir);
+                            if (parts.varsList.size() > 0){
+                                vars = parts.varsList.get(0);
+                            }
+                            preDelaySecondsString = XmlReplayEval.eval(preDelaySecondsString, null, vars, jexl, jc);
+                            if (preDelaySecondsString.equalsIgnoreCase("ERROR")) {
+                        		System.err.println(String.format("Could not evaluate the variable '%s' for the 'preDelaySeconds' attribute of test '%s'",
+                        				preDelaySecondsString, testID));                            	                            	
+                            } else if (Tools.isBlank(preDelaySecondsString)) {
+                        		System.err.println(String.format("Undefined variable '%s' for the 'preDelaySeconds' attribute of test '%s'",
+                        				testNode.valueOf("@preDelaySeconds"), testID));                     	                            	
+                            } else try {
+                        		seconds = Long.parseLong(preDelaySecondsString);
+                            } catch (NumberFormatException nfe2) {
+                        		System.err.println(String.format("Expected a valid number string for the 'preDelaySeconds' attribute of test '%s', but got '%s' instead.",
+                        				testID, preDelaySecondsString));                            	
+                            }
+                    	}
+                    }
+                    
+                    if (seconds > 0) {
+                		System.out.println(String.format("Pausing %d seconds before starting test '%s'...",
+                				seconds, testID));
+                		Thread.sleep(seconds * 1000);
+                		System.out.println(String.format("Starting test '%s'.", testID));
+                    }
 
                     Node responseNode = testNode.selectSingleNode("response");
                     PartsStruct expectedResponseParts = null;

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document name="locations">
+    <ns2:locations_common xmlns:ns2="http://collectionspace.org/services/location" xmlns:ns3="http://collectionspace.org/services/jaxb">
+        <locTermGroupList>
+            <locTermGroup>
+                <termDisplayName>${itemDisplayName}</termDisplayName>
+            </locTermGroup>
+        </locTermGroupList>
+    </ns2:locations_common>
+</document>

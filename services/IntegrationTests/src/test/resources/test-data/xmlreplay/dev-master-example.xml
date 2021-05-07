@@ -18,6 +18,7 @@
      
           cd trunk/services/IntegrationTests
           mvn test -Dtest=XmlReplayDevTest
+          mvn test -Dtest=XmlReplayDevTest -Dmaven.surefire.debug=true (debug XMLReplay itself with an IDE on port 5005)
 
      Maven surefire will kick off XmlReplayDevTest.
      

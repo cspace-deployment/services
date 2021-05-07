@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmlReplay>
+
+    <testGroup ID="UpdateDisplayName" autoDeletePOSTS="true" expectedCodesStrict="true">
+    	<!--
+    		For whatever reason, XMLReplay sets variable values only on POSTs and PUTs.  Therefore, we
+    		need to set our variables with a bogus POST.
+    	-->
+        <test ID="setUpVariables">
+            <expectedCodes>201</expectedCodes>
+            <method>POST</method>
+            <uri>/cspace-services/locationauthorities</uri>
+            <filename>authority/locationAuthority.xml</filename>
+            <vars>
+                <var ID="locationTerm_1_">a2810ec8-d954-4574-aa0d</var>
+                <var ID="locationTerm_2_">856a64f7-89a6-472c-8033</var>
+                <var ID="locationTerm_3_">9b9260bc-7fc7-41a8-b4e7</var>
+                
+                <var ID="preDelaySeconds">0</var>
+                <var ID="impTimeOutValue">5000</var>
+                <var ID="authDisplayName">setUpVariables</var>
+                <var ID="authShortIdentifier">setUpVariables</var>
+            </vars>
+        </test>
+
+        <!-- First Term -->
+        <test ID="verifyLocationTerm_1_Exists">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_1_}</uri>
+        </test>
+        <test ID="updateTerm_1_OriginalName">
+            <expectedCodes>200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_1_}?impTimeout=${setUpVariables.impTimeOutValue}&amp;update=true</uri>
+            <filename>authority/locationItem.xml</filename>
+            <vars>
+				<var ID="itemDisplayName">${verifyLocationTerm_1_Exists.got("//locTermGroupList[1]/locTermGroup/termDisplayName")}-updated</var>
+            </vars>
+        </test>
+        <test ID="restoreTerm_1_OriginalName" preDelaySeconds="${setUpVariables.preDelaySecondsx}">
+            <expectedCodes>200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_1_}?impTimeout=${setUpVariables.impTimeOutValue}&amp;restore=true</uri>
+            <filename>authority/locationItem.xml</filename>
+            <vars>
+				<var ID="itemDisplayName">${verifyLocationTerm_1_Exists.got("//locTermGroupList[1]/locTermGroup/termDisplayName")}</var>
+            </vars>
+        </test>
+
+        <!-- Second Term -->
+        <test ID="verifyLocationTerm_2_Exists">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_2_}</uri>
+        </test>
+        <test ID="updateTerm_2_OriginalName">
+            <expectedCodes>200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_2_}?impTimeout=${setUpVariables.impTimeOutValue}&amp;update=true</uri>
+            <filename>authority/locationItem.xml</filename>
+            <vars>
+				<var ID="itemDisplayName">${verifyLocationTerm_2_Exists.got("//locTermGroupList[1]/locTermGroup/termDisplayName")}-updated</var>
+            </vars>
+        </test>
+        <test ID="restoreTerm_2_OriginalName">
+            <expectedCodes>200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_2_}?impTimeout=${setUpVariables.impTimeOutValue}&amp;restore=true</uri>
+            <filename>authority/locationItem.xml</filename>
+            <vars>
+				<var ID="itemDisplayName">${verifyLocationTerm_2_Exists.got("//locTermGroupList[1]/locTermGroup/termDisplayName")}</var>
+            </vars>
+        </test>
+
+        <!-- Third Term -->
+        <test ID="verifyLocationTerm_3_Exists">
+            <expectedCodes>200</expectedCodes>
+            <method>GET</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_3_}</uri>
+        </test>
+        <test ID="updateTerm_3_OriginalName">
+            <expectedCodes>200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_3_}?impTimeout=${setUpVariables.impTimeOutValue}&amp;update=true</uri>
+            <filename>authority/locationItem.xml</filename>
+            <vars>
+				<var ID="itemDisplayName">${verifyLocationTerm_3_Exists.got("//locTermGroupList[1]/locTermGroup/termDisplayName")}-updated</var>
+            </vars>
+        </test>
+        <test ID="restoreTerm_3_OriginalName">
+            <expectedCodes>200</expectedCodes>
+            <method>PUT</method>
+            <uri>/cspace-services/locationauthorities/urn:cspace:name(location)/items/${setUpVariables.locationTerm_3_}?impTimeout=${setUpVariables.impTimeOutValue}&amp;restore=true</uri>
+            <filename>authority/locationItem.xml</filename>
+            <vars>
+				<var ID="itemDisplayName">${verifyLocationTerm_3_Exists.got("//locTermGroupList[1]/locTermGroup/termDisplayName")}</var>
+            </vars>
+        </test>
+
+	</testGroup>
+</xmlReplay>

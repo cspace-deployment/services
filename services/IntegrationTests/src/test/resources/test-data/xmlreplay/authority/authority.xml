@@ -6,7 +6,7 @@
         <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
         
-    <testGroup ID="TestAuthoritiesMultiVocabSearch" autoDeletePOSTS="true">
+    <testGroup ID="TestAuthoritiesMultiVocabSearch" autoDeletePOSTS="true" expectedCodesStrict="true">
         
         <!--
             Create three new vocabularies: two in the Person Authority,
