@@ -27,12 +27,23 @@ package org.collectionspace.services.collectionobject;
 
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.IQueryManager;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.Profiler;
 import org.collectionspace.services.common.NuxeoBasedResource;
+import org.collectionspace.services.common.ServiceMessages;
+import org.collectionspace.services.common.context.ServiceContext;
+import org.collectionspace.services.common.document.DocumentException;
+import org.collectionspace.services.common.document.DocumentHandler;
+import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 import org.jboss.resteasy.util.HttpResponseCodes;
+import org.nuxeo.ecm.core.api.ConcurrentUpdateException;
+import org.nuxeo.ecm.core.api.DocumentModel;
+import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.postgresql.util.PSQLException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,6 +57,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +108,22 @@ public class CollectionObjectResource extends NuxeoBasedResource {
 		profiler.stop();
 		
 		return result;
+    }
+    
+    @Override
+    protected Response create(PoxPayloadIn input, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
+        try {
+            return super.create(input, ctx);
+        } catch (ConcurrentUpdateException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof org.postgresql.util.PSQLException) {
+            	org.postgresql.util.PSQLException pe = (PSQLException) cause;
+            	if (pe.getSQLState() == JDBCTools.POSTGRES_UNIQUE_VIOLATION) {
+                    throw bigReThrow(cause, ServiceMessages.CREATE_FAILED);
+            	}
+            }
+            throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
+        }
     }
 
     /**
