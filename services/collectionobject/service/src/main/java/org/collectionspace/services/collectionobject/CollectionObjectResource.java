@@ -30,6 +30,7 @@ import org.collectionspace.services.client.IQueryManager;
 import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.client.Profiler;
+import org.collectionspace.services.common.CSWebApplicationException;
 import org.collectionspace.services.common.NuxeoBasedResource;
 import org.collectionspace.services.common.ServiceMessages;
 import org.collectionspace.services.common.context.ServiceContext;
@@ -37,6 +38,7 @@ import org.collectionspace.services.common.document.DocumentException;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.storage.JDBCTools;
 import org.collectionspace.services.jaxb.AbstractCommonList;
+import org.collectionspace.services.nuxeo.client.java.NuxeoDocumentException;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationshipType;
 import org.jboss.resteasy.util.HttpResponseCodes;
@@ -110,18 +112,35 @@ public class CollectionObjectResource extends NuxeoBasedResource {
 		return result;
     }
     
+    Throwable isUniuqeConstraintVilotation(Exception e) {
+    	Throwable result = null;
+    	
+    	Throwable cause = e.getCause();
+    	if (cause != null && cause instanceof NuxeoDocumentException) {
+    		cause = cause.getCause();
+            if (cause instanceof ConcurrentUpdateException) {
+            	cause = cause.getCause();
+	            if (cause != null && cause instanceof org.postgresql.util.PSQLException) {
+	            	org.postgresql.util.PSQLException pe = (PSQLException) cause;
+	            	if (pe.getSQLState() == JDBCTools.POSTGRES_UNIQUE_VIOLATION) {
+	                    result = cause;
+	            	}
+	            }
+            }
+    	}
+
+    	return result;
+    }
+    
     @Override
     protected Response create(PoxPayloadIn input, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         try {
             return super.create(input, ctx);
-        } catch (ConcurrentUpdateException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof org.postgresql.util.PSQLException) {
-            	org.postgresql.util.PSQLException pe = (PSQLException) cause;
-            	if (pe.getSQLState() == JDBCTools.POSTGRES_UNIQUE_VIOLATION) {
-                    throw bigReThrow(cause, ServiceMessages.CREATE_FAILED);
-            	}
-            }
+        } catch (CSWebApplicationException e) {
+        	Throwable cause = isUniuqeConstraintVilotation(e);
+        	if (cause != null) {
+                throw bigReThrow(cause, ServiceMessages.CREATE_FAILED);
+        	}
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
     }
