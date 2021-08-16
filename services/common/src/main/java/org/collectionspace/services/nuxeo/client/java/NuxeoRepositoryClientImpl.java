@@ -1565,7 +1565,6 @@ public class NuxeoRepositoryClientImpl implements RepositoryClient<PoxPayloadIn,
         return result;
     }
 
-
     private DocumentModelList getFilteredCMIS(CoreSessionInterface repoSession,
     		ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx, DocumentHandler handler, QueryContext queryContext)
             throws DocumentNotFoundException, DocumentException {

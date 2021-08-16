@@ -111,7 +111,25 @@ public class CollectionObjectResource extends NuxeoBasedResource {
 		
 		return result;
     }
-    
+
+    Throwable isUniuqeConstraintVilotation(NuxeoDocumentException e) {
+    	Throwable result = null;
+    	
+    	Throwable cause = e.getCause();    	
+        if (cause instanceof ConcurrentUpdateException) {
+        	cause = cause.getCause();
+            if (cause != null && cause instanceof org.postgresql.util.PSQLException) {
+            	org.postgresql.util.PSQLException pe = (PSQLException) cause;
+            	if ( pe.getSQLState() != null &&
+            			pe.getSQLState().equals(JDBCTools.POSTGRES_UNIQUE_VIOLATION)) {
+                    result = cause;
+            	}
+            }
+        }
+
+    	return result;
+    }
+
     Throwable isUniuqeConstraintVilotation(Exception e) {
     	Throwable result = null;
     	
@@ -122,7 +140,8 @@ public class CollectionObjectResource extends NuxeoBasedResource {
             	cause = cause.getCause();
 	            if (cause != null && cause instanceof org.postgresql.util.PSQLException) {
 	            	org.postgresql.util.PSQLException pe = (PSQLException) cause;
-	            	if (pe.getSQLState() == JDBCTools.POSTGRES_UNIQUE_VIOLATION) {
+	            	if ( pe.getSQLState() != null &&
+	            			pe.getSQLState().equals(JDBCTools.POSTGRES_UNIQUE_VIOLATION)) {
 	                    result = cause;
 	            	}
 	            }
@@ -131,7 +150,32 @@ public class CollectionObjectResource extends NuxeoBasedResource {
 
     	return result;
     }
-    
+
+    /**
+     * This override provides better error messaging in cases where the tenant's CollectionObject records have DB uniqueness constraints on
+     * some fields.
+     */
+    @Override
+    protected PoxPayloadOut update(String csid,
+            PoxPayloadIn theUpdate,
+            ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx)
+            throws Exception {
+
+    	try {
+    		return super.update(csid, theUpdate, ctx);
+        } catch (NuxeoDocumentException e) {
+        	Throwable cause = isUniuqeConstraintVilotation(e);
+        	if (cause != null) {
+                throw bigReThrow(cause, ServiceMessages.UPDATE_FAILED);
+        	}
+            throw bigReThrow(e, ServiceMessages.UPDATE_FAILED);
+        }
+    }
+
+    /**
+     * This override provides better error messaging in cases where the tenant's CollectionObject records have DB uniqueness constraints on
+     * some fields.
+     */
     @Override
     protected Response create(PoxPayloadIn input, ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx) {
         try {
@@ -144,27 +188,4 @@ public class CollectionObjectResource extends NuxeoBasedResource {
             throw bigReThrow(e, ServiceMessages.CREATE_FAILED);
         }
     }
-
-    /**
-     * This method is deprecated.  Use SearchCollectionObjects() method instead.
-     * Keywords search collection objects.
-     * @param ui 
-     * 
-     * @param keywords the keywords
-     * 
-     * @return the collectionobjects common list
-     */
-    /*
-    @GET
-    @Path("/search")
-    @Produces("application/xml")
-    @Deprecated
-    public AbstractCommonList keywordsSearchCollectionObjects(@Context UriInfo ui,
-            @QueryParam(IQueryManager.SEARCH_TYPE_KEYWORDS) String keywords) {
-    	MultivaluedMap<String, String> queryParams = ui.getQueryParameters();
-    	return search(queryParams, keywords);
-    }  
-     * 
-     */
-
 }
