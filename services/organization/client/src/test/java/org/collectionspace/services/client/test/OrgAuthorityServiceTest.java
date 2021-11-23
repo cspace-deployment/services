@@ -279,12 +279,9 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
      * @throws Exception the exception
      */
     @Test(dataProvider = "testName", groups = {"createList"},
-    		dependsOnMethods = {"createItemList"})
+    		dependsOnMethods = {"createItemList", "deleteContact"})
     public void createContactList(String testName) throws Exception {
-        // Add contacts to the initially-created, known item record.
-        for (int j = 0; j < nItemsToCreateInList; j++) {
-            createContact(testName);
-        }
+        createContact(testName); // As of CollectionSpace 7.1, only one contact item can be associated with an authority resource
     }
 
     // ---------------------------------------------------------------
@@ -706,13 +703,7 @@ public class OrgAuthorityServiceTest extends AbstractAuthorityServiceTest<Orgaut
         List<AbstractCommonList.ListItem> listitems =
             list.getListItem();
         int nItemsReturned = listitems.size();
-        // There will be one item created, associated with a
-        // known parent resource, by the createItem test.
-        //
-        // In addition, there will be 'nItemsToCreateInList'
-        // additional items created by the createItemList test,
-        // all associated with the same parent resource.
-        int nExpectedItems = nItemsToCreateInList + 1;
+        int nExpectedItems = 1; // As of CollectionSpace 7.1, only one contact item can be associated with an authority resource
         if (logger.isDebugEnabled()) {
             logger.debug(testName + ": Expected "
                     + nExpectedItems + " items; got: " + nItemsReturned);

@@ -34,6 +34,7 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
+import org.nuxeo.ecm.platform.picture.api.ImagingService;
 import org.nuxeo.osgi.application.MutableClassLoaderDelegate;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
@@ -173,6 +174,11 @@ public class NuxeoConnectorEmbedded {
 		CoreSession coreSession = null;
 
 		try {
+			//
+			// NOT FOR PRODUCTION
+			//
+			ImagingService imagingService = Framework.getService(ImagingService.class);
+			
 			Repository defaultRepo = Framework.getService(RepositoryManager.class).getDefaultRepository();
 			coreSession = CoreInstance.openCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
 			//
