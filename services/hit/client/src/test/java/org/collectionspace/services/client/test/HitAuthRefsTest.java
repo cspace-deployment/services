@@ -348,7 +348,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             String Valuer ) throws Exception {
         HitsCommon hit = new HitsCommon();
 
-        hit.setCsid("hits");
+        hit.setHitNumber(entryNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
