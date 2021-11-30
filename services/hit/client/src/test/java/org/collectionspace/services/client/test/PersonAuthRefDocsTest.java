@@ -448,7 +448,7 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
             String insurer,
             String Valuer) throws Exception {
         HitsCommon hit = new HitsCommon();
-        hit.setCsid("hits");
+        hit.setHitNumber(entryNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =

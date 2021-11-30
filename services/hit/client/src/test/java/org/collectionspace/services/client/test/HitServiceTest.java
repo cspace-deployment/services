@@ -249,7 +249,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
             String entryDate,
             String depositor) throws Exception {
         HitsCommon hit = new HitsCommon();
-        hit.setCsid("hits");
+        hit.setHitNumber(entryNumber);
 
         PoxPayloadOut multipart = new PoxPayloadOut(HitClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart =
@@ -274,7 +274,7 @@ public class HitServiceTest extends AbstractPoxServiceTestImpl<AbstractCommonLis
 	protected HitsCommon updateInstance(HitsCommon hitsCommon) {
 		HitsCommon result = new HitsCommon();
 
-		result.setCsid("hits");
+		result.setHitNumber("hits");
 
         return result;
 	}
