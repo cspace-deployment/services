@@ -20,7 +20,7 @@
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j15</artifactId>
+                    <artifactId>slf4j-log4j16</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
