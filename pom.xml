@@ -23,7 +23,7 @@
 		<spring.security.version>4.1.1.RELEASE</spring.security.version>
 		<spring.security.oauth2.version>2.0.10.RELEASE</spring.security.oauth2.version>
 		<aspectj.version>1.7.4</aspectj.version>
-		<log4j.version>2.16.0</log4j.version>
+		<log4j.version>2.17.0</log4j.version>
 	</properties>
 
 	<distributionManagement>
@@ -428,7 +428,7 @@
 					</exclusion>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j16</artifactId>
+						<artifactId>slf4j-log4j17</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>xml-apis</groupId>
@@ -520,7 +520,7 @@
 					</exclusion>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j16</artifactId>
+						<artifactId>slf4j-log4j17</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -531,7 +531,7 @@
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j16</artifactId>
+						<artifactId>slf4j-log4j17</artifactId>
 					</exclusion>
 					<exclusion>
 						<groupId>xerces</groupId>
@@ -592,7 +592,7 @@
 				<exclusions>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j16</artifactId>
+						<artifactId>slf4j-log4j17</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -636,7 +636,7 @@
 					</exclusion>
 					<exclusion>
 						<groupId>org.slf4j</groupId>
-						<artifactId>slf4j-log4j16</artifactId>
+						<artifactId>slf4j-log4j17</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
