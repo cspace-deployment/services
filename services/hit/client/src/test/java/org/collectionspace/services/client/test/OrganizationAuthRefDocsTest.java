@@ -107,7 +107,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
     // CRUD tests : CREATE tests
     // ---------------------------------------------------------------
     // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class)
+    @Test(dataProvider="testName", dataProviderClass=BaseServiceTest.class)
     public void createHitWithAuthRefs(String testName) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
 
@@ -245,8 +245,8 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         return result;
     }
 
-    // Success outcomes
-    @Test(dataProvider="testName", dataProviderClass=AbstractServiceTestImpl.class,
+    // Success outcomes here
+    @Test(dataProvider="testName", dataProviderClass=BaseServiceTest.class,
         dependsOnMethods = {"createHitWithAuthRefs"})
     public void readAndCheckAuthRefDocs(String testName) throws Exception {
         // Perform setup.
@@ -287,7 +287,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 i++;
             }
             //
-            Assert.assertTrue((nHitsFound==2), "Did not find Hit (twice) with authref!");
+            Assert.assertTrue((nHitsFound==2), "Did not find Hit (twice more) with authref!");
         }
     }
 

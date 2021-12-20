@@ -39,7 +39,15 @@ import org.collectionspace.services.client.PoxPayloadIn;
 import org.collectionspace.services.client.PoxPayloadOut;
 import org.collectionspace.services.common.api.GregorianCalendarDateTimeUtils;
 import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.hit.CorrespondenceGroup;
+import org.collectionspace.services.hit.CorrespondenceGroupList;
+import org.collectionspace.services.hit.ExternalApprovalGroup;
+import org.collectionspace.services.hit.ExternalApprovalGroupList;
+import org.collectionspace.services.hit.HitDepositorGroup;
+import org.collectionspace.services.hit.HitDepositorGroupList;
 import org.collectionspace.services.hit.HitsCommon;
+import org.collectionspace.services.hit.InternalApprovalGroup;
+import org.collectionspace.services.hit.InternalApprovalGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.person.PersonTermGroup;
 import org.testng.Assert;
@@ -63,7 +71,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
     // Instance variables specific to this test.
     final String SERVICE_PATH_COMPONENT = HitClient.SERVICE_PATH_COMPONENT;//"hits";
     final String PERSON_AUTHORITY_NAME = "TestPersonAuth";
-    private String knownResourceId = null;
+//    private String knownResourceId = null;
     private List<String> hitIdsCreated = new ArrayList<String>();
     private List<String> personIdsCreated = new ArrayList<String>();
     private String personAuthCSID = null;
@@ -349,6 +357,47 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
         HitsCommon hit = new HitsCommon();
 
         hit.setHitNumber(entryNumber);
+        
+        HitDepositorGroupList tempHDGL = hit.getHitDepositorGroupList();
+        if (tempHDGL == null) {
+        	tempHDGL = new HitDepositorGroupList();
+        }
+        List<HitDepositorGroup> hitDepositorGroupList = tempHDGL.getHitDepositorGroup();
+        HitDepositorGroup hitDepositorGroup = new HitDepositorGroup();
+        hitDepositorGroup.setDepositor(depositor);
+        hitDepositorGroup.setDepositorContact(currentOwner);
+        hitDepositorGroupList.add(hitDepositorGroup);
+        hit.setHitDepositorGroupList(tempHDGL);
+        
+        InternalApprovalGroupList tempIAGL = hit.getInternalApprovalGroupList();
+        if (tempIAGL == null) {
+        	tempIAGL = new InternalApprovalGroupList();
+        }
+        List<InternalApprovalGroup> internalApprovalGroupList = tempIAGL.getInternalApprovalGroup();
+        InternalApprovalGroup internalApprovalGroup = new InternalApprovalGroup();
+        internalApprovalGroup.setInternalApprovalIndividual(depositor);
+        internalApprovalGroupList.add(internalApprovalGroup);
+        hit.setInternalApprovalGroupList(tempIAGL);
+        
+        ExternalApprovalGroupList tempEAGL = hit.getExternalApprovalGroupList();
+        if (tempEAGL == null) {
+        	tempEAGL = new ExternalApprovalGroupList();
+        }
+        List<ExternalApprovalGroup> externalApprovalGroupList = tempEAGL.getExternalApprovalGroup();
+        ExternalApprovalGroup externalApprovalGroup = new ExternalApprovalGroup();
+        externalApprovalGroup.setExternalApprovalIndividual(conditionCheckerAssessor);
+        externalApprovalGroupList.add(externalApprovalGroup);
+        hit.setExternalApprovalGroupList(tempEAGL);
+        
+        CorrespondenceGroupList tempCGL = hit.getCorrespondenceGroupList();
+        if (tempCGL == null) {
+        	tempCGL = new CorrespondenceGroupList();
+        }
+        List<CorrespondenceGroup> correspondanceGroupList = tempCGL.getCorrespondenceGroup();
+        CorrespondenceGroup correspondanceGroup = new CorrespondenceGroup();
+        correspondanceGroup.setCorrespondenceSender(insurer);
+        correspondanceGroupList.add(correspondanceGroup);
+        hit.setCorrespondenceGroupList(tempCGL);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
