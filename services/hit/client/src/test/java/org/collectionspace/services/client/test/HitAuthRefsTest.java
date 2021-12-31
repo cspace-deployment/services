@@ -354,50 +354,7 @@ public class HitAuthRefsTest extends BaseServiceTest<AbstractCommonList> {
             String conditionCheckerAssessor,
             String insurer,
             String Valuer ) throws Exception {
-        HitsCommon hit = new HitsCommon();
-
-        hit.setHitNumber(entryNumber);
-        
-        HitDepositorGroupList tempHDGL = hit.getHitDepositorGroupList();
-        if (tempHDGL == null) {
-        	tempHDGL = new HitDepositorGroupList();
-        }
-        List<HitDepositorGroup> hitDepositorGroupList = tempHDGL.getHitDepositorGroup();
-        HitDepositorGroup hitDepositorGroup = new HitDepositorGroup();
-        hitDepositorGroup.setDepositor(depositor);
-        hitDepositorGroup.setDepositorContact(currentOwner);
-        hitDepositorGroupList.add(hitDepositorGroup);
-        hit.setHitDepositorGroupList(tempHDGL);
-        
-        InternalApprovalGroupList tempIAGL = hit.getInternalApprovalGroupList();
-        if (tempIAGL == null) {
-        	tempIAGL = new InternalApprovalGroupList();
-        }
-        List<InternalApprovalGroup> internalApprovalGroupList = tempIAGL.getInternalApprovalGroup();
-        InternalApprovalGroup internalApprovalGroup = new InternalApprovalGroup();
-        internalApprovalGroup.setInternalApprovalIndividual(depositor);
-        internalApprovalGroupList.add(internalApprovalGroup);
-        hit.setInternalApprovalGroupList(tempIAGL);
-        
-        ExternalApprovalGroupList tempEAGL = hit.getExternalApprovalGroupList();
-        if (tempEAGL == null) {
-        	tempEAGL = new ExternalApprovalGroupList();
-        }
-        List<ExternalApprovalGroup> externalApprovalGroupList = tempEAGL.getExternalApprovalGroup();
-        ExternalApprovalGroup externalApprovalGroup = new ExternalApprovalGroup();
-        externalApprovalGroup.setExternalApprovalIndividual(conditionCheckerAssessor);
-        externalApprovalGroupList.add(externalApprovalGroup);
-        hit.setExternalApprovalGroupList(tempEAGL);
-        
-        CorrespondenceGroupList tempCGL = hit.getCorrespondenceGroupList();
-        if (tempCGL == null) {
-        	tempCGL = new CorrespondenceGroupList();
-        }
-        List<CorrespondenceGroup> correspondanceGroupList = tempCGL.getCorrespondenceGroup();
-        CorrespondenceGroup correspondanceGroup = new CorrespondenceGroup();
-        correspondanceGroup.setCorrespondenceSender(insurer);
-        correspondanceGroupList.add(correspondanceGroup);
-        hit.setCorrespondenceGroupList(tempCGL);
+        HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor, conditionCheckerAssessor, insurer);
 
         PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =

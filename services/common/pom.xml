@@ -103,11 +103,6 @@
 			<artifactId>org.collectionspace.services.audit.jaxb</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.collectionspace.services</groupId>
-			<artifactId>org.collectionspace.services.client</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 
 <!--
 		<dependency>
@@ -253,11 +248,6 @@
 			<version>${nuxeo.platform.version}</version>
 		</dependency>
 		<dependency>
-		      <groupId>org.nuxeo.ecm.platform</groupId>
-			  <artifactId>nuxeo-platform-audit-core</artifactId>
-			  <scope>provided</scope>
-		</dependency>
-		<dependency>
 		    <groupId>org.nuxeo.elasticsearch</groupId>
 			<artifactId>nuxeo-elasticsearch-audit</artifactId>
 			<scope>provided</scope>
@@ -355,10 +345,6 @@
 			<groupId>commons-fileupload</groupId>
 			<artifactId>commons-fileupload</artifactId>
 			<version>1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>ch.elca.el4j.modules</groupId>
-			<artifactId>module-xml_merge-common</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

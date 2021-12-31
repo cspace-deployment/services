@@ -41,6 +41,7 @@ import org.collectionspace.services.common.authorityref.AuthorityRefDocList;
 import org.collectionspace.services.hit.HitsCommon;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgTermGroup;
+
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -269,12 +270,13 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         // Optionally output additional data about list members for debugging.
         boolean iterateThroughList = true;
         int nHitsFound = 0;
-        if(iterateThroughList && logger.isDebugEnabled()){
+        final int EXPECTED_HITS = 3;
+        if (iterateThroughList && logger.isDebugEnabled()) {
             List<AuthorityRefDocList.AuthorityRefDocItem> items =
                     list.getAuthorityRefDocItem();
             int i = 0;
             logger.debug(testName + ": Docs that use: " + currentOwnerRefName);
-            for(AuthorityRefDocList.AuthorityRefDocItem item : items){
+            for (AuthorityRefDocList.AuthorityRefDocItem item : items){
                 logger.debug(testName + ": list-item[" + i + "] " +
                 		item.getDocType() + "(" +
                 		item.getDocId() + ") Name:[" +
@@ -287,7 +289,7 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
                 i++;
             }
             //
-            Assert.assertTrue((nHitsFound==2), "Did not find Hit (twice more) with authref!");
+            Assert.assertTrue((nHitsFound == EXPECTED_HITS), "Did not find Hit (twice more) with authref!");
         }
     }
 
@@ -340,24 +342,20 @@ public class OrganizationAuthRefDocsTest extends BaseServiceTest<AbstractCommonL
         return SERVICE_PATH_COMPONENT;
     }
 
-   private PoxPayloadOut createHitInstance(String entryNumber,
-    		String entryDate,
-				String currentOwner,
-				String depositor,
-				String conditionCheckerAssessor,
-				String insurer,
-				String Valuer ) throws Exception {
-        HitsCommon hit = new HitsCommon();
+	private PoxPayloadOut createHitInstance(String entryNumber, String entryDate, String currentOwner, String depositor,
+			String conditionCheckerAssessor, String insurer, String Valuer) throws Exception {
+		HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
+				conditionCheckerAssessor, insurer); // new HitsCommon();
 
-        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+		PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
         PayloadOutputPart commonPart =
-            multipart.addPart(new HitClient().getCommonPartName(), hit);
+                multipart.addPart(new HitClient().getCommonPartName(), hit);
 
-        if(logger.isDebugEnabled()){
-            logger.debug("to be created, hit common");
-            logger.debug(objectAsXmlString(hit, HitsCommon.class));
-        }
+		if (logger.isDebugEnabled()) {
+			logger.debug("to be created, hit common");
+			logger.debug(objectAsXmlString(hit, HitsCommon.class));
+		}
 
-        return multipart;
-    }
+		return multipart;
+	}
 }
