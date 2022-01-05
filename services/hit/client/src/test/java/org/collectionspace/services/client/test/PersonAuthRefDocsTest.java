@@ -440,25 +440,21 @@ public class PersonAuthRefDocsTest extends BaseServiceTest<AbstractCommonList> {
         return SERVICE_PATH_COMPONENT;
     }
 
-    private PoxPayloadOut createHitInstance(String entryNumber,
-            String entryDate,
-            String currentOwner,
-            String depositor,
-            String conditionCheckerAssessor,
-            String insurer,
-            String Valuer) throws Exception {
-        HitsCommon hit = new HitsCommon();
-        hit.setHitNumber(entryNumber);
+	private PoxPayloadOut createHitInstance(String entryNumber, String entryDate, String currentOwner, String depositor,
+			String conditionCheckerAssessor, String insurer, String Valuer) throws Exception {
 
-        PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
-        PayloadOutputPart commonPart =
-                multipart.addPart(new HitClient().getCommonPartName(), hit);
+		HitsCommon hit = HitClientTestUtil.createHitInstance(entryNumber, currentOwner, depositor,
+				conditionCheckerAssessor, insurer);
+		hit.setHitNumber(entryNumber);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("to be created, hit common");
-            logger.debug(objectAsXmlString(hit, HitsCommon.class));
-        }
+		PoxPayloadOut multipart = new PoxPayloadOut(this.getServicePathComponent());
+		PayloadOutputPart commonPart = multipart.addPart(new HitClient().getCommonPartName(), hit);
 
-        return multipart;
-    }
+		if (logger.isDebugEnabled()) {
+			logger.debug("to be created, hit common");
+			logger.debug(objectAsXmlString(hit, HitsCommon.class));
+		}
+
+		return multipart;
+	}
 }
