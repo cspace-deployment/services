@@ -520,11 +520,13 @@ import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerIm
 	}
 
 	protected FieldEntry processBlobProperty(Context context, Property oldProperty, Property newProperty) {
-		Blob oldBlob = (Blob) oldProperty.getValue();
+		Blob oldBlob = (Blob) (oldProperty != null ? oldProperty.getValue() : null);
 		String oldFilename = oldBlob != null ? oldBlob.getFilename() : null;
+		String oldPropertyXPath = oldProperty != null ? oldProperty.getXPath() : null;
+		
 		Blob newBlob = (Blob) newProperty.getValue();
 		String newFilename = newBlob != null ? newBlob.getFilename() : null;
-		return getEntry(context, oldProperty.getXPath(), oldFilename, newFilename);
+		return getEntry(context, oldPropertyXPath, oldFilename, newFilename);
 	}
 
 	protected FieldEntry getEntry(Context context, String fieldName, String comment, Serializable oldValue, Serializable newValue) {
@@ -577,7 +579,7 @@ import org.collectionspace.services.nuxeo.listener.AbstractCSEventSyncListenerIm
 	}
 
 	protected String normalizeFieldName(String fieldName) {
-		if (fieldName.startsWith("/")) {
+		if (fieldName != null && fieldName.startsWith("/")) {
 			return fieldName.substring(1);
 		} else {
 			return fieldName;
