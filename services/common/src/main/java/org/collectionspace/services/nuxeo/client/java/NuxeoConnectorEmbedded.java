@@ -5,19 +5,10 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Iterator;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.management.JMException;
 import javax.servlet.ServletContext;
@@ -34,7 +25,6 @@ import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.SystemPrincipal;
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
-import org.nuxeo.ecm.platform.picture.api.ImagingService;
 import org.nuxeo.osgi.application.MutableClassLoaderDelegate;
 import org.nuxeo.runtime.api.Framework;
 import org.nuxeo.runtime.transaction.TransactionHelper;
@@ -174,11 +164,6 @@ public class NuxeoConnectorEmbedded {
 		CoreSession coreSession = null;
 
 		try {
-			//
-			// NOT FOR PRODUCTION
-			//
-			ImagingService imagingService = Framework.getService(ImagingService.class);
-			
 			Repository defaultRepo = Framework.getService(RepositoryManager.class).getDefaultRepository();
 			coreSession = CoreInstance.openCoreSession(defaultRepo.getName(), new SystemPrincipal(null));
 			//
