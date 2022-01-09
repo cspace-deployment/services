@@ -30,6 +30,7 @@
                     "ecm:name",
                     "ecm:primaryType",
                     "materials_common:shortIdentifier",
+                    "materials_common:featuredCollectionGroupList",
                     "materials_common:publishToList",
                     "materials_common:externalUrlGroupList",
                     "materials_common:materialTermGroupList",
@@ -70,12 +71,15 @@
                     "materials_common:rapidPrototypingProcesses",
                     "materials_common:additionalProcessGroupList",
                     "materials_common:processNote",
+                    "collectionobjects_common:objectHistoryNote",
                     "collectionobjects_common:objectNumber",
                     "collectionobjects_common:objectStatusList",
                     "collectionobjects_common:publishToList",
                     "collectionobjects_common:materialGroupList",
                     "collectionobjects_common:otherNumberList",
+                    "collectionobjects_common:ownersContributionNote",
                     "collectionobjects_common:collection",
+                    "collectionobjects_common:namedCollections",
                     "collectionobjects_common:computedCurrentLocation",
                     "collectionobjects_materials:materialContainerGroupList",
                     "collectionobjects_materials:materialConditionGroupList",
@@ -87,6 +91,7 @@
                     "collectionobjects_common:numberOfObjects",
                     "collectionobjects_common:briefDescriptions",
                     "collectionobjects_common:measuredPartGroupList",
+                    "collectionobjects_common:viewersContributionNote",
                     "media_common:blobCsid",
                     "media_materials:publishToList"
                   ]
@@ -130,6 +135,27 @@
                       }
                     }
                   },
+                  "collectionspace_denorm:mediaAltText": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionspace_denorm:exhibition": {
+                    "type": "object",
+                    "properties": {
+                      "title": {
+                        "type": "keyword",
+                        "copy_to": "all_field"
+                      },
+                      "generalNote": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      },
+                      "curatorialNote": {
+                        "type": "text",
+                        "copy_to": "all_field"
+                      }
+                    }
+                  },
 
                   "collectionspace_core:createdAt": {
                     "type": "date",
@@ -147,6 +173,15 @@
                     "properties": {
                       "termDisplayName": {
                         "type": "text",
+                        "copy_to": "all_field"
+                      }
+                    }
+                  },
+                  "materials_common:featuredCollectionGroupList": {
+                    "type": "object",
+                    "properties": {
+                      "featuredCollection": {
+                        "type": "keyword",
                         "copy_to": "all_field"
                       }
                     }
@@ -578,6 +613,10 @@
                       }
                     }
                   },
+                  "collectionobjects_common:briefDescriptions": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
                   "collectionobjects_common:materialGroupList": {
                     "type": "object",
                     "properties": {
@@ -596,6 +635,18 @@
                         }
                       }
                     }
+                  },
+                  "collectionobjects_common:objectHistoryNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:ownersContributionNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
+                  },
+                  "collectionobjects_common:viewersContributionNote": {
+                    "type": "text",
+                    "copy_to": "all_field"
                   },
 
                   "media_materials:publishToList": {
