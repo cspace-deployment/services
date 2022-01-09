@@ -1065,7 +1065,7 @@ public abstract class AuthorityResource<AuthCommon, AuthItemHandler>
         }
 
         result = (PoxPayloadOut) ctx.getOutput();
-        if (result != null) {
+        if (result != null && !parentcsid.equals(PARENT_WILDCARD)) {
             String inAuthority = XmlTools.getElementValue(result.getDOMDocument(), "//" + AuthorityItemJAXBSchema.IN_AUTHORITY);
             if (inAuthority.equalsIgnoreCase(parentcsid) == false) {
                 throw new Exception(String.format("Looked up item = '%s' and found with inAuthority = '%s', but expected inAuthority = '%s'.",
