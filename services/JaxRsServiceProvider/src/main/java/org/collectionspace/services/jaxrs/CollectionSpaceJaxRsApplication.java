@@ -27,6 +27,7 @@ import org.collectionspace.services.account.TenantResource;
 import org.collectionspace.services.blob.BlobResource;
 import org.collectionspace.services.collectionobject.CollectionObjectResource;
 import org.collectionspace.services.id.IDResource;
+import org.collectionspace.services.insurance.InsuranceResource;
 import org.collectionspace.services.media.MediaResource;
 import org.collectionspace.services.group.GroupResource;
 import org.collectionspace.services.hit.HitResource;
@@ -34,12 +35,14 @@ import org.collectionspace.services.intake.IntakeResource;
 import org.collectionspace.services.index.IndexResource;
 import org.collectionspace.services.loanin.LoaninResource;
 import org.collectionspace.services.loanout.LoanoutResource;
+import org.collectionspace.services.transport.TransportResource;
 import org.collectionspace.services.uoc.UocResource;
 import org.collectionspace.services.audit.AuditResource;
 import org.collectionspace.services.valuationcontrol.ValuationcontrolResource;
 import org.collectionspace.services.objectexit.ObjectExitResource;
 import org.collectionspace.services.batch.BatchResource;
 import org.collectionspace.services.imports.ImportsResource;
+import org.collectionspace.services.export.ExportResource;
 import org.collectionspace.services.location.LocationAuthorityResource;
 import org.collectionspace.services.place.PlaceAuthorityResource;
 import org.collectionspace.services.work.WorkAuthorityResource;
@@ -113,6 +116,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         singletons.add(new PermissionResource());
         singletons.add(new ServiceGroupResource());
         singletons.add(new ImportsResource());
+        singletons.add(new ExportResource());
         singletons.add(new StructuredDateResource());
         singletons.add(new SystemInfoResource());
         singletons.add(new IndexResource());
@@ -131,6 +135,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new ContactResource());
         addResourceToMapAndSingletons(new CollectionObjectResource());
         addResourceToMapAndSingletons(new GroupResource());
+        addResourceToMapAndSingletons(new InsuranceResource());
         addResourceToMapAndSingletons(new IntakeResource());
         addResourceToMapAndSingletons(new HitResource());
         addResourceToMapAndSingletons(new DimensionResource());
@@ -153,6 +158,7 @@ public class CollectionSpaceJaxRsApplication extends Application
         addResourceToMapAndSingletons(new ClaimResource());
         addResourceToMapAndSingletons(new ReportResource());
         addResourceToMapAndSingletons(new PublicItemResource());
+        addResourceToMapAndSingletons(new TransportResource());
 
         singletons.add(new IDResource());
         singletons.add(new AuditResource());
