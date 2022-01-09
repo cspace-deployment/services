@@ -408,6 +408,7 @@ public abstract class AbstractAuthorityServiceTest<AUTHORITY_COMMON_TYPE, AUTHOR
     		throw new SkipException(String.format("Skipped the test since this authority '%s' doesn't support synchronization.",
     				client.getServiceName()));
     	}
+
     	//
     	// Test to see if the test tenancy's authority supports synchronization.
     	// 
