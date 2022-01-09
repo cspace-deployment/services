@@ -607,7 +607,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		ForRoles forRolesList = reportCommon.getForRoles();
 		if (forRolesList != null) {
 			AccountResource accountResource = new AccountResource();
-			List<String> roleDisplayNameList = accountResource.getAccountRoles(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
+			List<String> roleDisplayNameList = accountResource.getAccountRoleDisplayNames(AuthN.get().getUserId(), AuthN.get().getCurrentTenantId());
 			for (String target : forRolesList.getRoleDisplayName()) {
 				if (Tools.listContainsIgnoreCase(roleDisplayNameList, target)) {
 					result = true;
