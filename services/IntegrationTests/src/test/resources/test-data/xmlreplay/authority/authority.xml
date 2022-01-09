@@ -2,12 +2,12 @@
 <xmlReplay>
     
 	<!-- IMPORTANT: THESE ARE STICKY :: THEY STICK AROUND UNTIL RESET, IN EXEC ORDER OF THIS FILE. -->
-    <auths default="admin@pahma.cspace.berkeley.edu">
-       <auth ID="admin@pahma.cspace.berkeley.edu">YWRtaW5AcGFobWEuY3NwYWNlLmJlcmtlbGV5LmVkdTpBZG1pbmlzdHJhdG9y</auth>
+    <auths default="admin@core.collectionspace.org">
+        <auth ID="admin@core.collectionspace.org">YWRtaW5AY29yZS5jb2xsZWN0aW9uc3BhY2Uub3JnOkFkbWluaXN0cmF0b3I=</auth>
     </auths>
 
-    <testGroup ID="TestAuthorityItemsWithContacts" autoDeletePOSTS="true">
-        <test ID="createPersonAuthority1" auth="admin@pahma.cspace.berkeley.edu">
+    <testGroup ID="TestAuthorityItemsWithContacts" autoDeletePOSTS="true" expectedCodesStrict="true">
+        <test ID="createPersonAuthority1" auth="admin@core.collectionspace.org">
             <expectedCodes>201</expectedCodes>
             <method>POST</method>
             <uri>/cspace-services/personauthorities</uri>

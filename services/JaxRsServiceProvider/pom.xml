@@ -188,6 +188,11 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+          <groupId>org.collectionspace.services</groupId>
+          <artifactId>org.collectionspace.services.insurance.service</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.intake.service</artifactId>
             <version>${project.version}</version>
@@ -221,7 +226,12 @@
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.audit.service</artifactId>
             <version>${project.version}</version>
-        </dependency>        
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.transport.service</artifactId>
+            <version>${project.version}</version>
+        </dependency>     
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.claim.service</artifactId>
@@ -260,7 +270,12 @@
         <dependency>
             <groupId>org.collectionspace.services</groupId>
             <artifactId>org.collectionspace.services.imports.service</artifactId>
-             <version>${project.version}</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.collectionspace.services</groupId>
+            <artifactId>org.collectionspace.services.export.service</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.collectionspace.services</groupId>
