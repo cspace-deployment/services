@@ -31,6 +31,7 @@ public class JsonToXmlStreamConverterTest {
         testConvert("numeric-json");
         testConvert("boolean-json");
         testConvert("single-list-item-json");
+        testConvert("export-invocation");
         testConvertThrows("empty-json", XMLStreamException.class);
     }
     
