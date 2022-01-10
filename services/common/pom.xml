@@ -256,6 +256,7 @@
 		<dependency>
 			<groupId>org.nuxeo.ecm.platform</groupId>
 			<artifactId>nuxeo-platform-imaging-core</artifactId>
+			<version>${nuxeo.platform.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -372,7 +373,6 @@
 				<artifactId>mybatis</artifactId>
 				<version>3.5.4</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.easymock</groupId>
 			<artifactId>easymock</artifactId>
