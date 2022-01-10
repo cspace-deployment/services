@@ -89,6 +89,17 @@ public class ConversionUtils {
     }
     
     /**
+     * Determines if a JSON field name represents XML element content.
+     *
+     * @param jsonFieldName the field name to test
+     * @return true if the field name represents XML element content,
+     *         false otherwise
+     */
+    public static boolean isXmlContent(String jsonFieldName) {
+        return jsonFieldName.equals(".");
+    }
+
+    /**
      * Converts an XML element QName to a JSON field name.
      * 
      * @param name the XML element QName

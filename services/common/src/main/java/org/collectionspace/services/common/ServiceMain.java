@@ -77,9 +77,9 @@ import org.slf4j.LoggerFactory;
 public class ServiceMain {
 	final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
 
-	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v6.0";
-	public static final String VER_MAJOR = "6";
-	public static final String VER_MINOR = "0";
+	public static final String VER_DISPLAY_NAME = "CollectionSpace Services v7.1";
+	public static final String VER_MAJOR = "7";
+	public static final String VER_MINOR = "1";
 	public static final String VER_PATCH = "0";
 	public static final String VER_BUILD = "1";
 
@@ -119,9 +119,7 @@ public class ServiceMain {
     private static final String DROP_USER_IF_EXISTS_SQL_CMD = DROP_USER_SQL_CMD + " IF EXISTS %s;";
     private static final String DROP_OBJECTS_SQL_COMMENT = "-- drop all the objects before dropping roles";
 	private static final String CSPACE_JEESERVER_HOME = "CSPACE_JEESERVER_HOME";
-
 	private static final String CSPACE_UTILS_SCHEMANAME = "utils";
-
 	private static final String RUNSQLSCRIPTS_SERVICE_NAME = "runsqlscripts";
 
     private ServiceMain() {
