@@ -62,7 +62,7 @@
 			<xs:element name="configMD5Hash" type="xs:string" minOccurs="0" maxOccurs="1"/>					<!-- Transient, only used during startup.  Not part of config file. -->
 			<xs:element name="configChangedSinceLastStart" type="xs:boolean" minOccurs="0" maxOccurs="1"/>	<!-- Transient, only used during startup.  Not part of config file. -->
 		</xs:sequence>
-		<!-- tenant id -->
+		<!-- tenant id, a UUID -->
 		<xs:attribute name="id" type="xs:ID" use="required"/>
 		<!-- tenant shortName -->
 		<xs:attribute name="shortName" type="xs:string" use="required"/>
@@ -155,6 +155,7 @@
 			<xs:element name="password" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 		<xs:attribute name="enabled" type="xs:boolean" use="optional" default="false"/>
+		<xs:attribute name="protocols" type="xs:string" use="optional" default="TLSv1.2"/>
 	</xs:complexType>
 
 	<xs:complexType name="PasswordResetConfig">
