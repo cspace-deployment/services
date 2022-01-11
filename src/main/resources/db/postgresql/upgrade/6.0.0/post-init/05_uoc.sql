@@ -31,7 +31,7 @@
 
     public.uoc_common ============> MIGRATION NEEDED: various fields updated to repeatable fields/groups.
     public.uoc_common_methodlist => NO MIGRATION NEEDED.
-    public.usergroup =============> NO MIGRATION NEEDED, although 3 new fields were added to the table.
+    public.usergroup =============> MIGRATION NEEDED: 2 new fields added; MIGRATE userType to userInstitutionRole
 
 -- Version 5.2 uoc_common table description and migration note:
 
@@ -391,5 +391,63 @@ BEGIN
     END IF;
 END
 $$;
+
+/* Version 5.2 usergroup table description and migration note:
+
+   -- Version 5.2 usergroup table description:
+
+                             Table "public.usergroup"
+          Column  |         Type          | Collation | Nullable | Migration Note
+        ----------+-----------------------+-----------+----------+--------------------------------
+         id       | character varying(36) |           | not null |
+         usertype | character varying     |           |          | MIGRATE to userinstitutionrole
+         user     | character varying     |           |          |
+        Indexes:
+            "usergroup_pk" PRIMARY KEY, btree (id)
+        Foreign-key constraints:
+            "usergroup_id_hierarchy_fk" FOREIGN KEY (id) REFERENCES hierarchy(id) ON DELETE CASCADE
+
+   -- NEW usergroup table description:
+
+                        Table "public.usergroup"
+               Column        |         Type          | Modifiers | Migration Note
+        ---------------------+-----------------------+-----------+--------------------------------
+         id                  | character varying(36) | not null  | NO CHANGE
+         usertype            | character varying     |           | MIGRATE to userinstitutionrole
+         user                | character varying     |           | NO CHANGE
+         userinstitution     | character varying     |           | NEW COLUMN
+         userinstitutionrole | character varying     |           | NEW; MIGRATE from usertype
+         useruocrole         | character varying     |           | NEW COLUMN
+        Indexes:
+            "usergroup_pk" PRIMARY KEY, btree (id)
+        Foreign-key constraints:
+            "usergroup_id_hierarchy_fk" FOREIGN KEY (id) REFERENCES hierarchy(id) ON DELETE CASCADE
+
+    -- Migration Note:
+
+       Two new columns were added for User: Institution Role, and User: Use of Collections role.
+       Instead of re-nameing the userType column to userInstitutionRole, the old column will remain, and
+       the userType data is migrated to userInstitutionRole.
+*/
+
+-- Migrate v5.2 UOC User Type data from userType to userInstitutionRole in the userGroup table:
+-- Check to make sure both columns exist in userGroup table.
+-- Only update when userInstitutionRole is NULL.
+
+DO $$
+BEGIN   
+        IF 2 = (SELECT count(*) c
+                FROM information_schema.columns
+                WHERE table_name = 'usergroup'
+                AND column_name IN ('usertype', 'userinstitutionrole'))
+        THEN
+                UPDATE usergroup
+                SET userinstitutionrole = usertype
+                WHERE userinstitutionrole IS NULL;
+        ELSE
+                RAISE NOTICE 'Unable to update userGroup: userType and/or userInstitutionRole columns missing.';
+        END IF;
+END $$;
+
 
 -- END OF MIGRATION

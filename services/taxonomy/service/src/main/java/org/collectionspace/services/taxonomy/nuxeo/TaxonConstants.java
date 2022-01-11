@@ -62,5 +62,4 @@ public class TaxonConstants {
     public static final String TAXON_HYBRID_NAME = "taxonomicIdentHybridName";
     public static final String HYBRID_FLAG = "hybridFlag";
     public static final String AFF_TAXON = "affinityTaxon";
-
 }

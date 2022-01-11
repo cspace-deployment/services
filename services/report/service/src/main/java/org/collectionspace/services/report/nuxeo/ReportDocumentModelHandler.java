@@ -34,6 +34,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.naming.NamingException;
@@ -111,15 +112,17 @@ import org.slf4j.LoggerFactory;
  * $LastChangedDate: $
  */
 public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<ReportsCommon> {
-    private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
+		private final Logger logger = LoggerFactory.getLogger(ReportDocumentModelHandler.class);
+
+		private static final Pattern INVALID_CSID_PATTERN = Pattern.compile("[^\\w\\-]");
     private static String REPORTS_FOLDER = "reports";
     private static String CSID_LIST_SEPARATOR = ",";
-    
+
     private static String REPORTS_STD_CSID_PARAM = "csid";
     private static String REPORTS_STD_GROUPCSID_PARAM = "groupcsid";
     private static String REPORTS_STD_CSIDLIST_PARAM = "csidlist";
     private static String REPORTS_STD_TENANTID_PARAM = "tenantid";
-    
+
     //
     // Map the MIME types from the service bindings to our payload output
     //
@@ -134,7 +137,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
     		result.setMIMETypeList(resultMIMEType = new MIMEType());
     	}
     	List<MIMETypeItemType> resultMIMETypeItemList = resultMIMEType.getMIMEType();
-    	
+
     	//
     	// Read the MIME type values from the service bindings and put into our response payload
     	//
@@ -142,7 +145,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
                 ServiceMain.getInstance().getTenantBindingConfigReader();
         ServiceBindingType reportServiceBinding = tReader.getServiceBinding(ctx.getTenantId(), ctx.getServiceName());
         List<PropertyItemType> bindingsMIMETypeList = ServiceBindingUtils.getPropertyValueList(reportServiceBinding, ServiceBindingUtils.OUTPUT_MIME_PROP);
-        
+
         if (bindingsMIMETypeList != null) {
         	for (PropertyItemType bindingItemMimeType : bindingsMIMETypeList) {
         		MIMETypeItemType resultMimeTypeItem = new MIMETypeItemType();
@@ -159,7 +162,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
         return result;
     }
-    
+
     private String getInvocationContextLogging(InvocationContext invContext, Map<String, Object> params) {
 		String outputMIME = invContext.getOutputMIME();
 		String mode = invContext.getMode();
@@ -181,6 +184,14 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		return result;
 	}
 
+	private String assertValidCsid(String csid) throws IllegalArgumentException {
+		if (INVALID_CSID_PATTERN.matcher(csid).find()) {
+			throw new IllegalArgumentException("Invalid csid: " + csid);
+		}
+
+		return csid;
+	}
+
 	public InputStream invokeReport(
 			ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx,
 			String csid,
@@ -190,10 +201,10 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			StringBuffer outReportFileName) throws Exception {
 		CoreSessionInterface repoSession = null;
 		boolean releaseRepoSession = false;
-		
+
 		// Ensure the current user has permission to run this report
 		if (isAuthoritzed(reportsCommon) == false) {
-			String msg = String.format("Report Resource: The user '%s' is not authorized to run the report '%s' CSID='%s'", 
+			String msg = String.format("Report Resource: The user '%s' is not authorized to run the report '%s' CSID='%s'",
 					AuthN.get().getUserId(), reportsCommon.getName(), csid);
 			throw new PermissionException(msg);
 		}
@@ -203,13 +214,13 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(REPORTS_STD_TENANTID_PARAM, ctx.getTenantId());
 		boolean checkDocType = true;
-		
+
 		// Note we set before we put in the default ones, so they cannot override tenant or CSID.
 		setParamsFromContext(params, invContext);
-		
+
 		if (Invocable.INVOCATION_MODE_SINGLE.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_SINGLE_DOC;
-    		params.put(REPORTS_STD_CSID_PARAM, invContext.getSingleCSID());
+			params.put(REPORTS_STD_CSID_PARAM, assertValidCsid(invContext.getSingleCSID()));
 		} else if (Invocable.INVOCATION_MODE_LIST.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_DOC_LIST;
 			List<String> csids = null;
@@ -228,12 +239,12 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 						first = false;
 					else
 						sb.append(CSID_LIST_SEPARATOR);
-	   				sb.append(csidItem);
+	   				sb.append(assertValidCsid(csidItem));
 				}
     		params.put(REPORTS_STD_CSIDLIST_PARAM, sb.toString());
 		} else if(Invocable.INVOCATION_MODE_GROUP.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_GROUP;
-    		params.put(REPORTS_STD_GROUPCSID_PARAM, invContext.getGroupCSID());
+			params.put(REPORTS_STD_GROUPCSID_PARAM, assertValidCsid(invContext.getGroupCSID()));
 		} else if(Invocable.INVOCATION_MODE_NO_CONTEXT.equalsIgnoreCase(invocationMode)) {
 			modeProperty = InvocableJAXBSchema.SUPPORTS_NO_CONTEXT;
 			checkDocType = false;
@@ -241,11 +252,11 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			throw new BadRequestException("ReportResource: unknown Invocation Mode: "
         			+invocationMode);
 		}
-		
+
 		logger.debug("The invocation context is: \n " + getInvocationContextLogging(invContext, params));
 		logger.debug("The report is being called with the following parameters, which are being passed to Jasper: \n" + params.toString());
 		logger.debug("The mode being passed to Jasper is: " + invocationMode);
-		
+
 		NuxeoRepositoryClientImpl repoClient = (NuxeoRepositoryClientImpl)this.getRepositoryClient(ctx);
 		repoSession = this.getRepositorySession();
 		if (repoSession == null) {
@@ -265,7 +276,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	        			+invocationMode);
 			}
 	    	if (checkDocType) {
-	    		List<String> forDocTypeList = 
+	    		List<String> forDocTypeList =
 	    			(List<String>) NuxeoUtils.getProperyValue(docModel, InvocableJAXBSchema.FOR_DOC_TYPES); //docModel.getPropertyValue(InvocableJAXBSchema.FOR_DOC_TYPES);
 	    		if (forDocTypeList==null || !forDocTypeList.contains(invContext.getDocType())) {
 	        		throw new BadRequestException(
@@ -312,10 +323,10 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				repoClient.releaseRepositorySession(ctx, repoSession);
 			}
 		}
-		
+
        	return buildReportResult(csid, params, reportFileNameProperty, outMimeType.toString(), outReportFileName);
 	}
-	
+
 	private void setParamsFromContext(Map<String, Object> params, InvocationContext invContext) {
 		InvocationContext.Params icParams = invContext.getParams();
 		if(icParams!= null) {
@@ -330,31 +341,31 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				}
 			}
 		}
-		
+
 	}
 
-    private InputStream buildReportResult(String reportCSID, 
+    private InputStream buildReportResult(String reportCSID,
     		HashMap<String, Object> params, String reportFileName, String outputMimeType, StringBuffer outReportFileName)
     				throws Exception {
 		Connection conn = null;
 		InputStream result = null;
-		
+
     	try {
     		String fileNameBase = Tools.getFilenameBase(reportFileName);
     		String compiledReportFilename = fileNameBase+ReportClient.COMPILED_REPORT_EXTENSION;
     		String reportDescriptionFilename = fileNameBase+ReportClient.REPORT_DECSRIPTION_EXTENSION;
-    		
+
 			String basePath = ServiceMain.getInstance().getServerRootDir() +
-								File.separator + JEEServerDeployment.CSPACE_DIR_NAME + 
+								File.separator + JEEServerDeployment.CSPACE_DIR_NAME +
 								File.separator + REPORTS_FOLDER +
 								// File.separator + tenantName +
 								File.separator; // + reportFileName;
-			
-			String compiledFilePath = basePath+compiledReportFilename; 
+
+			String compiledFilePath = basePath+compiledReportFilename;
 			File f = new File(compiledFilePath);
 			if(!f.exists()) { // Need to compile the file
 				// First verify that there is a source file.
-				String sourceFilePath = basePath+reportDescriptionFilename; 
+				String sourceFilePath = basePath+reportDescriptionFilename;
 				File f2 = new File(sourceFilePath);
 				if(!f2.exists()) { // Missing source file - error!
 					logger.error("Report for csid={} is missing the specified source file: {}",
@@ -364,28 +375,28 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
             	logger.info("Report for csid={} is not compiled. Compiling first, and saving to: {}",
             			reportCSID, compiledFilePath);
             	JasperCompileManager.compileReportToFile(sourceFilePath, compiledFilePath);
-			}				
-				
+			}
+
 			conn = getConnection();
-	
+
             if (logger.isTraceEnabled()) {
             	logger.trace("ReportResource for csid=" + reportCSID
             			+" output as "+outputMimeType+" using report file: "+compiledFilePath);
             }
 			FileInputStream fileStream = new FileInputStream(compiledFilePath);
-	
+
 			// export report to pdf and build a response with the bytes
 			//JasperExportManager.exportReportToPdf(jasperprint);
-			
+
 			JRExporter exporter = null;
 			// Strip extension from report filename.
 			String outputFilename = reportFileName;
 			// Strip extension from report filename.
-			int idx = outputFilename.lastIndexOf("."); 
+			int idx = outputFilename.lastIndexOf(".");
 			if(idx>0)
 				outputFilename = outputFilename.substring(0, idx);
 			// Strip any sub-dir from report filename.
-			idx = outputFilename.lastIndexOf(File.separator); 
+			idx = outputFilename.lastIndexOf(File.separator);
 			if(idx>0)
 				outputFilename = outputFilename.substring(idx+1);
 			if(outputMimeType.equals(MediaType.APPLICATION_XML)) {
@@ -433,15 +444,15 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
                         }
                         // fill the report
 			JasperPrint jasperPrint = JasperFillManager.fillReport(fileStream, params,conn);
-				
+
 			// Report will be to a temporary file.
 			File tempOutputFile = Files.createTempFile("report-", null).toFile();
-			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);			
+			FileOutputStream tempOutputStream = new FileOutputStream(tempOutputFile);
 			exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
 			exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, tempOutputStream);
 			exporter.exportReport();
 			tempOutputStream.close();
-			
+
 			result = new FileInputStream(tempOutputFile);
 	       	return result;
         } catch (SQLException sqle) {
@@ -452,7 +463,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	            SQLException tempException = sqle;
 	            while (null != tempException) {
 	                	logger.debug("SQL Exception: " + sqle.getLocalizedMessage());
-	
+
 	                // loop to the next exception
 	                tempException = tempException.getNextException();
 	            }
@@ -486,7 +497,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
                     // set up a loop to make sure we let the user know about all of them
                     // if there happens to be more than one.
                     if (logger.isDebugEnabled()) {
-   	                	logger.debug("SQL Exception closing connection: " 
+   	                	logger.debug("SQL Exception closing connection: "
    	                			+ sqle.getLocalizedMessage());
                     }
                 } catch (Exception e) {
@@ -500,7 +511,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 
     private Connection getConnection() throws NamingException, SQLException {
     	Connection result = null;
-    	
+
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
     	try {
     		String repositoryName = ctx.getRepositoryName();
@@ -513,7 +524,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 			Log.error(e);
 			throw new NamingException();
 		}
-    	
+
     	return result;
     }
 
@@ -525,7 +536,7 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 	 */
 	protected boolean isAuthoritzedWithPermissions(ReportsCommon reportsCommon) {
 		boolean result = true;
-		
+
 		ResourceActionGroupList resourceActionGroupList = reportsCommon.getResourceActionGroupList();
 		if (resourceActionGroupList != null) {
 			String tenantId = AuthN.get().getCurrentTenantId();
@@ -540,70 +551,70 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
 	/**
 	 * Returns true if we found any required permissions.
-	 * 
+	 *
 	 * @param reportCommon
 	 * @return
 	 */
 	private boolean hasRequiredPermissions(ReportsCommon reportCommon) {
 		boolean result = false;
-		
+
 		try {
 			result = reportCommon.getResourceActionGroupList().getResourceActionGroup().size() > 0;
 		} catch (NullPointerException e) {
 			// ignore exception, we're just testing to see if we have any list elements
 		}
-		
+
 		return result;
 	}
-	
+
 	/**
 	 * Returns true if we found any required roles.
-	 * 
+	 *
 	 * @param reportCommon
 	 * @return
 	 */
 	private boolean hasRequiredRoles(ReportsCommon reportCommon) {
 		boolean result = false;
-		
+
 		try {
 			result = reportCommon.getForRoles().getRoleDisplayName().size() > 0;
 		} catch (NullPointerException e) {
 			// ignore exception, we're just testing to see if we have any list elements
 		}
-		
+
 		return result;
 	}
-    
+
 	/**
 	 * The current user is authorized to run the report if:
 	 * 	1. No permissions or roles are specified in the report
 	 *  2. No roles are specified, but permissions are specified and the current user has those permissions
 	 *  3. Roles are specified and the current user is a member of at least one of the roles.
-	 * 
+	 *
 	 * @param reportsCommon
 	 * @return
 	 */
 	protected boolean isAuthoritzed(ReportsCommon reportsCommon) {
 		boolean result = true;
-		
-		if (hasRequiredRoles(reportsCommon)) { 
+
+		if (hasRequiredRoles(reportsCommon)) {
 			result = isAuthorizedWithRoles(reportsCommon);
 		} else if (hasRequiredPermissions(reportsCommon)) {
 			result = isAuthoritzedWithPermissions(reportsCommon);
 		}
-		 		
+
 		return result;
 	}
-	
+
 	protected boolean isAuthorizedWithRoles(ReportsCommon reportCommon) {
 		boolean result = false;
-		
+
 		ForRoles forRolesList = reportCommon.getForRoles();
 		if (forRolesList != null) {
 			AccountResource accountResource = new AccountResource();
@@ -615,9 +626,8 @@ public class ReportDocumentModelHandler extends NuxeoDocumentModelHandler<Report
 				}
 			}
 		}
-		
+
 		return result;
 	}
 
 }
-

@@ -122,6 +122,24 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 
 	}
 
+	/**
+	 * Normalizes a display date for evaluation.
+	 * - Remove leading and trailing whitespace
+	 * - Remove leading and trailing braces
+	 * - Convert to lowercase
+	 *
+	 * @param displayDate
+	 * @return The normalized display date
+	 */
+	protected String normalizeDisplayDate(String displayDate) {
+		String normalDisplayDate =
+			displayDate
+				.replaceAll("^[\\[\\(\\{\\s]+|[\\]\\)\\}\\s]+$", "")
+				.toLowerCase();
+
+		return normalDisplayDate;
+	}
+
 	@Override
 	public StructuredDateInternal evaluate(String displayDate) throws StructuredDateFormatException {
 		stack = new Stack<Object>();
@@ -129,8 +147,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		result = new StructuredDateInternal();
 		result.setDisplayDate(displayDate);
 
-		// Instantiate a parser from the lowercased display date, so that parsing will be case insensitive
-		ANTLRInputStream inputStream = new ANTLRInputStream(displayDate.toLowerCase());
+		// Instantiate a parser from the normalized display date.
+		ANTLRInputStream inputStream = new ANTLRInputStream(normalizeDisplayDate(displayDate));
 		StructuredDateLexer lexer = new StructuredDateLexer(inputStream);
 		CommonTokenStream tokenStream = new CommonTokenStream(lexer);
 		StructuredDateParser parser = new StructuredDateParser(tokenStream);
@@ -165,16 +183,16 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDisplayDate(DisplayDateContext ctx) {
 		if (ctx.exception != null) return;
-		logger.warn("The stack in exitDisplayDate");
-		logger.info(stack.toString());
-		logger.warn(stack.toString());
+		logger.debug("The stack in exitDisplayDate");
+		logger.debug(stack.toString());
+		logger.debug(stack.toString());
 
-		logger.warn("The dates:in exitDisplayDate ");
+		logger.debug("The dates:in exitDisplayDate ");
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
-		logger.warn(latestDate.toString());
-		logger.warn(earliestDate.toString());
+		logger.debug(latestDate.toString());
+		logger.debug(earliestDate.toString());
 		if (earliestDate.getYear() != null || earliestDate.getYear() != null) {
 			int compareResult = DateUtils.compareDates(earliestDate, latestDate);
 			if (compareResult == 1) {
@@ -283,8 +301,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 		Date latestDate = (Date) stack.pop();
 		Date earliestDate = (Date) stack.pop();
 
-		logger.warn("In exitCertainDate: ");
-		logger.warn(stack.toString());
+		logger.debug("In exitCertainDate: ");
+		logger.debug(stack.toString());
 		
 		// Set null eras to the default.
 
@@ -453,8 +471,8 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 	@Override
 	public void exitDate(DateContext ctx) {
 		if (ctx.exception != null) return;
-		logger.warn("in exitDate: ");
-		logger.warn(stack.toString());
+		logger.debug("in exitDate: ");
+		logger.debug(stack.toString());
 
 		// Expect the canonical year-month-day-era ordering
 		// to be on the stack.
@@ -592,7 +610,6 @@ public class ANTLRStructuredDateEvaluator extends StructuredDateBaseListener imp
 			throw new StructuredDateFormatException("unexpected year '" + Integer.toString(year) + "'");
 		}
 	}
-
 
 	@Override
 	public void exitInvStrDateEraLastDate(InvStrDateEraLastDateContext ctx) {
