@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document name="report">
+  <ns2:reports_common xmlns:ns2="http://collectionspace.org/services/report">
+    <name>Deads in Bed - for iReport</name>
+    <notes>takes location string</notes>
+    <forDocTypes>
+      <forDocType>collectionobject</forDocType>
+    </forDocTypes>
+    <supportsSingleDoc>true</supportsSingleDoc>
+    <supportsDocList>false</supportsDocList>
+    <supportsGroup>false</supportsGroup>
+    <supportsNoContext>true</supportsNoContext>
+    <filename>ucbgDiedInLocationVerbatim.jrxml</filename>
+    <outputMIME>application/pdf</outputMIME>
+  </ns2:reports_common>
+</document>
