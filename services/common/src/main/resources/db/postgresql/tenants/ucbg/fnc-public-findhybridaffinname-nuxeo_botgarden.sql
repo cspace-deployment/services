@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.findhybridaffinname2 (tigid character varying)
+CREATE OR REPLACE FUNCTION public.findhybridaffinname (tigid character varying)
   RETURNS character varying
   LANGUAGE plpgsql
   IMMUTABLE STRICT
