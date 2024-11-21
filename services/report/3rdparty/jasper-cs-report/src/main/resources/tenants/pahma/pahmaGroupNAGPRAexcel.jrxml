@@ -30,198 +30,261 @@
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 
-        <parameter name="csid" class="java.lang.String" isForPrompting="false">
-                <parameterDescription><![CDATA[Object CSID]]></parameterDescription>
-        </parameter>
-        <parameter name="groupcsid" class="java.lang.String" isForPrompting="false">
-                <parameterDescription><![CDATA[Group CSID]]></parameterDescription>
-        </parameter>
-        <parameter name="csidlist" class="java.lang.String" isForPrompting="false">
-                <parameterDescription><![CDATA[CSID List]]></parameterDescription>
-        </parameter>
-        <parameter name="objcsids" class="java.lang.String" isForPrompting="false">
-                <defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : ""]]></defaultValueExpression>
-        </parameter>
-        <parameter name="wherecsid" class="java.lang.String" isForPrompting="false">
-                <defaultValueExpression><![CDATA[$P{csid} != null ? ("h.name = '" + $P{csid} + "'") : ""]]></defaultValueExpression>
-        </parameter>
-        <parameter name="wheregroup" class="java.lang.String" isForPrompting="false">
-                <defaultValueExpression><![CDATA[$P{groupcsid} != null ? ("h.name IN (SELECT objectcsid FROM relations_common WHERE objectdocumenttype = 'CollectionObject' AND subjectcsid = '" + $P{groupcsid} + "')") : ""]]></defaultValueExpression>
-        </parameter>
-        <parameter name="wherelist" class="java.lang.String" isForPrompting="false">
-                <defaultValueExpression><![CDATA[$P{csidlist} != null ? ("h.name IN (" + $P{objcsids} + ")") : ""]]></defaultValueExpression>
-        </parameter>
-        <parameter name="whereclause" class="java.lang.String" isForPrompting="false">
-                <defaultValueExpression><![CDATA[$P{wherecsid} + $P{wheregroup} + $P{wherelist}]]></defaultValueExpression>
-        </parameter>
+	<parameter name="csid" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Object CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="groupcsid" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[Group CSID]]></parameterDescription>
+	</parameter>
+	<parameter name="csidlist" class="java.lang.String" isForPrompting="false">
+		<parameterDescription><![CDATA[CSID List]]></parameterDescription>
+	</parameter>
+	<parameter name="objcsids" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("'" + $P{csidlist}.replaceAll(",", "','") + "'") : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="wherecsid" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csid} != null ? ("h.name = '" + $P{csid} + "'") : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="wheregroup" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{groupcsid} != null ? ("h.name IN (SELECT objectcsid FROM relations_common WHERE objectdocumenttype = 'CollectionObject' AND subjectcsid = '" + $P{groupcsid} + "')") : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="wherelist" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{csidlist} != null ? ("h.name IN (" + $P{objcsids} + ")") : ""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="whereclause" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[$P{wherecsid} + $P{wheregroup} + $P{wherelist}]]></defaultValueExpression>
+	</parameter>
 
 	<queryString>
-		<![CDATA[SELECT cc.objectnumber AS "Museum_number",
-COALESCE(STRING_AGG(DISTINCT ang.pahmaaltnum,'␥'),'') AS "Alternate_numbers",
-COALESCE(STRING_AGG(DISTINCT oe.exitnumber,'␥'),'') AS "Exit_numbers",
-COALESCE(STRING_AGG(DISTINCT oe.exitdate,'␥'),'') AS "Exit_dates",
-COALESCE(STRING_AGG(DISTINCT getdispl(oe.newowner),'␥'),'') AS "Current_or_new_owners",
-COALESCE(STRING_AGG(DISTINCT getdispl(oe.exitreason),'␥'),'') AS "Exit_reasons",
-COALESCE(REGEXP_REPLACE(ong.objectname, E'[\\n\\r]+', '¶', 'g' ),'') AS "Object_name",
-COALESCE(REGEXP_REPLACE(bd.item, E'[\\n\\r]+', '¶', 'g' ),'') AS "Description",
-cc.numberofobjects AS "Count",
-COALESCE(getdispl(fcp.item),'') AS "Field_collection_place",
-COALESCE(utils.placename_hierarchy.place_hierarchy,'') AS "Field_collection_place_hierarchy",
-COALESCE(REGEXP_REPLACE(cp.pahmafieldlocverbatim, E'[\\n\\r]+', '¶', 'g' ),'') AS "Verbatim_field_collection_place",
-COALESCE(STRING_AGG(DISTINCT getdispl(fcmeth.item),'␥'),'') AS "Field_collection_methods",
-COALESCE(STRING_AGG(DISTINCT getdispl(fcsrc.item),'␥'),'') AS "Field_collection_sources",
-COALESCE(STRING_AGG(DISTINCT getdispl(fcoll.item),'␥'),'') AS "Field_collectors",
-COALESCE(scd.datedisplaydate,'') AS "Field_collection_date",
-COALESCE(REGEXP_REPLACE(cc.fieldcollectionnote, E'[\\n\\r]+', '¶', 'g' ),'') AS "Field_collection_note",
-COALESCE(getdispl(cp.pahmatmslegacydepartment),'') AS "Legacy_department",
-COALESCE(STRING_AGG(DISTINCT getdispl(nc.item),'␥'),'') AS "Museums_NAGPRA_category_determinations",
-COALESCE(STRING_AGG(DISTINCT getdispl(inv.item),'␥'),'') AS "NAGPRA_inventory",
-COALESCE(STRING_AGG(DISTINCT acc.accnumber,'␥'),'') AS "Accession_numbers",
-COALESCE(STRING_AGG(DISTINCT acc.accdate, '␥'),'') AS "Accession_dates",
-COALESCE(STRING_AGG(DISTINCT acc.acqdate, '␥'),'') AS "Acquisition_dates",
-COALESCE(STRING_AGG(DISTINCT acc.donor,'␥'),'') AS "Donors",
-COALESCE(STRING_AGG(DISTINCT acc.sources,'␥'),'') AS "Acquisition_sources",
-COALESCE(STRING_AGG(DISTINCT acc.methods,'␥'),'') AS "Acquisition_methods",
-COALESCE(STRING_AGG(DISTINCT getdispl(oslAFIL.item),'␥'),'') AS "Affiliation_status_from_object_status",
-COALESCE(STRING_AGG(DISTINCT getdispl(oslDISP.item),'␥'),'') AS "Accession_status_from_object_status",
-COALESCE(STRING_AGG(DISTINCT getdispl(oslMODE.item),'␥'),'') AS "Deaccession_mode_from_object_status",
-COALESCE(STRING_AGG(DISTINCT getdispl(mat.material),'␥'),'') AS "Materials",
-COALESCE(ug.usage,'') AS "Context_of_use",
-COALESCE(STRING_AGG(DISTINCT getdispl(apg.assocpeople),'␥'),'') AS "Cultural_groups",
-COALESCE(spd.datedisplaydate,'') AS "Production_date",
-COALESCE(STRING_AGG(DISTINCT getdispl(prodpl.prodplaces),'␥'),'') AS "Production_places",
-COALESCE(STRING_AGG(DISTINCT prodpl.prodplacehier,'␥'),'') AS "Production_place_hierarchy",
-COALESCE(STRING_AGG(DISTINCT getdispl(oppr.objectproductionpeople),'␥'),'') AS "Production_cultural_groups",
-COALESCE(STRING_AGG(DISTINCT getdispl(oprs.objectproductionperson),'␥'),'') AS "Production_persons",
-COALESCE(STRING_AGG(DISTINCT getdispl(oporg.objectproductionorganization),'␥'),'') AS "Production_organizations",
-COALESCE(STRING_AGG(DISTINCT coll.item,'␥'),'') AS "Collections",
-(SELECT         SUM(va.valueamount) AS "Amount"
-                FROM relations_common rcv
-                JOIN hierarchy hv ON (hv.name=rcv.objectcsid)
-                JOIN valuationcontrols_common vc ON (hv.id=vc.id)
-                JOIN misc mv ON (vc.id=mv.id AND mv.lifecyclestate<>'deleted')
-                LEFT OUTER JOIN hierarchy h4 ON (h4.parentid=vc.id AND h4.name='valuationcontrols_common:valueAmountsList')
-                LEFT OUTER JOIN valueamounts va ON h4.id=va.id
-                WHERE rcv.objectdocumenttype='Valuationcontrol' AND rcv.subjectcsid=h.name
-                GROUP BY rcv.subjectcsid, vc.valuationcontrolrefnumber
-                ORDER BY vc.valuationcontrolrefnumber DESC
-                LIMIT 1
-                ) AS "Valuation",
-COALESCE(STRING_AGG(DISTINCT getdispl(efc.item),'␥'),'') AS "File_codes",
-COALESCE(getdispl(cc.computedcurrentlocation),'') AS "Current_location",
-COALESCE(cp.iscomponent,'') AS "Is_component"
-
+		<![CDATA[SELECT
+	cc.objectnumber AS "Museum_number",
+	COALESCE(STRING_AGG(DISTINCT ang.pahmaaltnum,'␥'),'') AS "Alternate_numbers",
+	COALESCE(STRING_AGG(DISTINCT oe.exitnumber,'␥'),'') AS "Exit_numbers",
+	COALESCE(STRING_AGG(DISTINCT oe.exitdate,'␥'),'') AS "Exit_dates",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oe.newowner),'␥'),'') AS "Current_or_new_owners",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oe.exitreason),'␥'),'') AS "Exit_reasons",
+	COALESCE(REGEXP_REPLACE(ong.objectname, E'[\\n\\r]+', '¶', 'g' ),'') AS "Object_name",
+	COALESCE(REGEXP_REPLACE(bd.item, E'[\\n\\r]+', '¶', 'g' ),'') AS "Description",
+	ocg.objectcount AS "Count",
+	COALESCE(GETDISPL(fcp.item),'') AS "Field_collection_place",
+	COALESCE(utils.placename_hierarchy.place_hierarchy,'') AS "Field_collection_place_hierarchy",
+	COALESCE(REGEXP_REPLACE(cp.pahmafieldlocverbatim, E'[\\n\\r]+', '¶', 'g' ),'') AS "Verbatim_field_collection_place",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(fcmeth.item),'␥'),'') AS "Field_collection_methods",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(fcsrc.item),'␥'),'') AS "Field_collection_sources",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(fcoll.item),'␥'),'') AS "Field_collectors",
+	COALESCE(scd.datedisplaydate,'') AS "Field_collection_date",
+	COALESCE(REGEXP_REPLACE(cc.fieldcollectionnote, E'[\\n\\r]+', '¶', 'g' ),'') AS "Field_collection_note",
+	COALESCE(GETDISPL(cp.pahmatmslegacydepartment),'') AS "Legacy_department",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(nc.item),'␥'),'') AS "Museums_NAGPRA_category_determinations",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(inv.item),'␥'),'') AS "NAGPRA_inventory",
+	COALESCE(STRING_AGG(DISTINCT acc.accnumber,'␥'),'') AS "Accession_numbers",
+	COALESCE(STRING_AGG(DISTINCT acc.accdate, '␥'),'') AS "Accession_dates",
+	COALESCE(STRING_AGG(DISTINCT acc.acqdate, '␥'),'') AS "Acquisition_dates",
+	COALESCE(STRING_AGG(DISTINCT acc.donor,'␥'),'') AS "Donors",
+	COALESCE(STRING_AGG(DISTINCT acc.sources,'␥'),'') AS "Acquisition_sources",
+	COALESCE(STRING_AGG(DISTINCT acc.methods,'␥'),'') AS "Acquisition_methods",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oslAFIL.item),'␥'),'') AS "Affiliation_status_from_object_status",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oslDISP.item),'␥'),'') AS "Accession_status_from_object_status",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oslMODE.item),'␥'),'') AS "Deaccession_mode_from_object_status",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(mat.material),'␥'),'') AS "Materials",
+	COALESCE(ug.usage,'') AS "Context_of_use",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(apg.assocpeople),'␥'),'') AS "Cultural_groups",
+	COALESCE(spd.datedisplaydate,'') AS "Production_date",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(prodpl.prodplaces),'␥'),'') AS "Production_places",
+	COALESCE(STRING_AGG(DISTINCT prodpl.prodplacehier,'␥'),'') AS "Production_place_hierarchy",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oppr.objectproductionpeople),'␥'),'') AS "Production_cultural_groups",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oprs.objectproductionperson),'␥'),'') AS "Production_persons",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(oporg.objectproductionorganization),'␥'),'') AS "Production_organizations",
+	COALESCE(STRING_AGG(DISTINCT coll.item,'␥'),'') AS "Collections",
+	(SELECT SUM(va.valueamount) AS "Amount"
+		FROM relations_common rcv
+		JOIN hierarchy hv ON (hv.name = rcv.objectcsid)
+		JOIN valuationcontrols_common vc ON (hv.id = vc.id)
+		JOIN misc mv ON (vc.id = mv.id
+			AND mv.lifecyclestate<>'deleted')
+		LEFT OUTER JOIN hierarchy h4 ON (h4.parentid = vc.id
+			AND h4.name = 'valuationcontrols_common:valueAmountsList')
+		LEFT OUTER JOIN valueamounts va ON h4.id = va.id
+		WHERE rcv.objectdocumenttype = 'Valuationcontrol'
+		AND rcv.subjectcsid = h.name
+		GROUP BY
+			rcv.subjectcsid,
+			vc.valuationcontrolrefnumber
+		ORDER BY vc.valuationcontrolrefnumber DESC
+		LIMIT 1
+	) AS "Valuation",
+	COALESCE(STRING_AGG(DISTINCT GETDISPL(efc.item),'␥'),'') AS "File_codes",
+	COALESCE(GETDISPL(cc.computedcurrentlocation),'') AS "Current_location",
+	COALESCE(cp.iscomponent,'') AS "Is_component"
 FROM collectionobjects_common cc
-JOIN collectionobjects_pahma cp ON (cc.id=cp.id)
-JOIN misc m ON (cc.id=m.id AND m.lifecyclestate<>'deleted')
-JOIN hierarchy h ON (cc.id=h.id)
-LEFT OUTER JOIN hierarchy hn ON (cc.id=hn.parentid AND hn.name='collectionobjects_common:objectNameList' AND (hn.pos=0))
-LEFT OUTER JOIN objectnamegroup ong ON (ong.id=hn.id)
-LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=cc.id AND (bd.pos=0))
-LEFT OUTER JOIN collectionobjects_nagpra_nagpracategories nc ON (nc.id=cc.id)
-LEFT OUTER JOIN collectionobjects_nagpra_nagprainventorynames inv ON (inv.id=cc.id)
-LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (fcp.id=cc.id AND (fcp.pos=0 OR fcp.pos IS NULL))
-LEFT OUTER JOIN places_common pcfcp ON (pcfcp.shortidentifier=REGEXP_REPLACE(fcp.item, '^.*item:name\((.*?)\)''.*', '\1'))
-LEFT OUTER JOIN hierarchy pcsidfcp ON (pcfcp.id=pcsidfcp.id)
-LEFT OUTER JOIN utils.placename_hierarchy ON (pcsidfcp.name=utils.placename_hierarchy.placecsid)
-LEFT OUTER JOIN collectionobjects_pahma_pahmacollectionlist coll ON (coll.id=cc.id)
-LEFT OUTER JOIN collectionobjects_common_fieldcollectionmethods fcmeth ON (fcmeth.id=cc.id)
-LEFT OUTER JOIN collectionobjects_common_fieldcollectionsources fcsrc ON (fcsrc.id=cc.id)
-LEFT OUTER JOIN collectionobjects_common_fieldcollectors fcoll ON (fcoll.id=cc.id)
-LEFT OUTER JOIN hierarchy hcd ON (hcd.parentid=cc.id AND hcd.primarytype='structuredDateGroup' AND hcd.name='collectionobjects_pahma:pahmaFieldCollectionDateGroupList' AND (hcd.pos=0 or hcd.pos IS NULL))
-LEFT OUTER JOIN structureddategroup scd ON (scd.id=hcd.id)
-LEFT OUTER JOIN hierarchy hppr ON (hppr.parentid=cc.id AND hppr.primarytype='objectProductionPeopleGroup')
-LEFT OUTER JOIN objectproductionpeoplegroup oppr ON (oppr.id=hppr.id)
-LEFT OUTER JOIN hierarchy hprs ON (hprs.parentid=cc.id AND hprs.primarytype='objectProductionPersonGroup')
-LEFT OUTER JOIN objectproductionpersongroup oprs ON (oprs.id=hprs.id)
-LEFT OUTER JOIN hierarchy hporg ON (hporg.parentid=cc.id AND hporg.primarytype='objectProductionOrganizationGroup')
-LEFT OUTER JOIN objectproductionorganizationgroup oporg ON (oporg.id=hporg.id)
-LEFT OUTER JOIN collectionobjects_pahma_pahmaethnographicfilecodelist efc ON (efc.id=cc.id)
-LEFT OUTER JOIN hierarchy hm ON (hm.parentid=cc.id AND hm.primarytype='materialGroup')
-LEFT OUTER JOIN materialgroup mat ON (mat.id=hm.id)
-LEFT OUTER JOIN hierarchy hu ON (hu.parentid=cc.id AND hu.primarytype='usageGroup' AND (hu.pos=0 OR hu.pos IS NULL))
-LEFT OUTER JOIN usagegroup ug ON (ug.id=hu.id)
-LEFT OUTER JOIN hierarchy hc ON (hc.parentid=cc.id AND hc.primarytype='assocPeopleGroup')
-LEFT OUTER JOIN assocpeoplegroup apg ON (apg.id=hc.id)
-LEFT OUTER JOIN hierarchy han ON (han.parentid=cc.id AND han.primarytype='pahmaAltNumGroup')
-LEFT OUTER JOIN pahmaaltnumgroup ang ON (ang.id=han.id)
-LEFT OUTER JOIN hierarchy hpd ON (hpd.parentid=cc.id AND hpd.primarytype='structuredDateGroup' AND hpd.name='collectionobjects_common:objectProductionDateGroupList' AND (hpd.pos=0 or hpd.pos IS NULL))
-LEFT OUTER JOIN structureddategroup spd ON (spd.id=hpd.id)
-LEFT OUTER JOIN collectionobjects_pahma_pahmaobjectstatuslist oslAFIL ON (oslAFIL.id=cc.id AND getdispl(oslAFIL.item) IN (
-'culturally affiliated',
-'culturally unaffiliated'))
-LEFT OUTER JOIN collectionobjects_pahma_pahmaobjectstatuslist oslDISP ON (oslDISP.id=cc.id AND getdispl(oslDISP.item) IN (
-'deaccessioned',
-'accessioned',
-'(unknown)',
-'partially deaccessioned',
-'recataloged',
-'partially recataloged'))
-LEFT OUTER JOIN collectionobjects_pahma_pahmaobjectstatuslist oslMODE ON (oslMODE.id=cc.id AND getdispl(oslMODE.item) IN (
-'intended for repatriation',
-'pending repatriation',
-'intended for transfer',
-'repatriated',
-'destroyed',
-'missing',
-'sold',
-'stolen',
-'missing in inventory',
-'discarded',
-'exchanged',
-'partially exchanged',
-'transferred'))
-LEFT OUTER JOIN (SELECT
-                STRING_AGG(DISTINCT xc.exitnumber,'␥') AS "exitnumber",
-                STRING_AGG(DISTINCT sdg.datedisplaydate,'␥') AS "exitdate",
-                STRING_AGG(DISTINCT getdispl(xan.item),'␥') AS "newowner",
-                STRING_AGG(DISTINCT getdispl(xc.exitreason),'␥') AS "exitreason",
-                rcx.subjectcsid
-                FROM relations_common rcx
-                JOIN hierarchy hx ON (hx.name=rcx.objectcsid)
-                JOIN objectexit_common xc ON (hx.id=xc.id)
-                JOIN misc mx ON (xc.id=mx.id AND mx.lifecyclestate<>'deleted')
-                LEFT OUTER JOIN hierarchy h3 ON (h3.parentid=xc.id AND h3.name='objectexit_common:exitDateGroup')
-                LEFT OUTER JOIN structureddategroup sdg ON (h3.id=sdg.id)
-                LEFT OUTER JOIN objectexit_anthropology_newownerlist xan ON (xan.id=xc.id)
-                WHERE rcx.objectdocumenttype='ObjectExit'
-                GROUP BY rcx.subjectcsid) oe ON oe.subjectcsid=h.name
-LEFT OUTER JOIN (SELECT
-                STRING_AGG(DISTINCT ac.acquisitionreferencenumber,'␥') AS "accnumber",
-                STRING_AGG(DISTINCT sad1.datedisplaydate, '␥') AS "accdate",
-                STRING_AGG(DISTINCT sad2.datedisplaydate, '␥') AS "acqdate",
-                STRING_AGG(DISTINCT getdispl(adg.donor),'␥') AS "donor",
-                STRING_AGG(DISTINCT getdispl(acs.item),'␥') AS "sources",
-                STRING_AGG(DISTINCT getdispl(ac.acquisitionmethod),'␥') AS "methods",
-                rcac.subjectcsid
-                FROM relations_common rcac
-                JOIN hierarchy hac ON (rcac.objectcsid=hac.name)
-                JOIN acquisitions_common ac ON (hac.id=ac.id)
-                JOIN misc mac ON (ac.id=mac.id AND mac.lifecyclestate<>'deleted')
-                LEFT OUTER JOIN hierarchy had1 ON (ac.id=had1.parentid AND had1.primarytype='structuredDateGroup' AND had1.name='acquisitions_common:accessionDateGroup' AND (had1.pos=0 OR had1.pos IS NULL))
-                LEFT OUTER JOIN structureddategroup sad1 ON (sad1.id=had1.id)
-                LEFT OUTER JOIN hierarchy had2 ON (ac.id=had2.parentid AND had2.primarytype='structuredDateGroup' AND had2.name='acquisitions_common:acquisitionDateGroupList' AND (had2.pos=0 OR had2.pos IS NULL))
-                LEFT OUTER JOIN structureddategroup sad2 ON (sad2.id=had2.id)
-                LEFT OUTER JOIN hierarchy h2 ON (ac.id = h2.parentid AND h2.name = 'acquisitions_pahma:acquisitionDonorGroupList')
-                LEFT OUTER JOIN acquisitiondonorgroup adg ON (adg.id = h2.id)
-                LEFT OUTER JOIN acquisitions_common_acquisitionsources acs ON (acs.id=ac.id)
-                WHERE rcac.objectdocumenttype='Acquisition'
-                GROUP BY rcac.subjectcsid) acc ON acc.subjectcsid=h.name
-LEFT OUTER JOIN (SELECT
-                STRING_AGG(DISTINCT getdispl(oppl.objectproductionplace),'␥') AS "prodplaces",
-                STRING_AGG(DISTINCT utils.placename_hierarchy.place_hierarchy,'␥') AS "prodplacehier",
-                ccppl.id AS "ccid"
-                FROM collectionobjects_common ccppl
-                LEFT OUTER JOIN hierarchy hppl ON (hppl.parentid=ccppl.id AND hppl.primarytype='objectProductionPlaceGroup')
-                LEFT OUTER JOIN objectproductionplacegroup oppl ON (oppl.id=hppl.id)
-                LEFT OUTER JOIN places_common pcopp ON (pcopp.shortidentifier=REGEXP_REPLACE(oppl.objectproductionplace, '^.*item:name\((.*?)\)''.*', '\1'))
-                LEFT OUTER JOIN hierarchy pcsidopp ON (pcopp.id=pcsidopp.id)
-                LEFT OUTER JOIN utils.placename_hierarchy ON (pcsidopp.name=utils.placename_hierarchy.placecsid)
-                GROUP BY ccppl.id) prodpl ON prodpl.ccid=cc.id
+JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
+JOIN misc m ON (cc.id = m.id
+	AND m.lifecyclestate<>'deleted')
+JOIN hierarchy h ON (cc.id = h.id)
+LEFT OUTER JOIN hierarchy hn ON (cc.id = hn.parentid
+	AND hn.primarytype = 'objectNameGroup'
+	AND (hn.pos = 0))
+LEFT OUTER JOIN objectnamegroup ong ON (ong.id = hn.id)
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id = cc.id
+	AND (bd.pos = 0))
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0)
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+LEFT OUTER JOIN collectionobjects_nagpra_nagpracategories nc ON (nc.id = cc.id)
+LEFT OUTER JOIN collectionobjects_nagpra_nagprainventorynames inv ON (inv.id = cc.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (fcp.id = cc.id
+	AND (fcp.pos = 0 OR fcp.pos IS NULL))
+LEFT OUTER JOIN places_common pcfcp ON (pcfcp.shortidentifier = REGEXP_REPLACE(fcp.item, '^.*item:name\((.*?)\)''.*', '\1'))
+LEFT OUTER JOIN hierarchy pcsidfcp ON (pcfcp.id = pcsidfcp.id)
+LEFT OUTER JOIN utils.placename_hierarchy ON (pcsidfcp.name = utils.placename_hierarchy.placecsid)
+LEFT OUTER JOIN collectionobjects_pahma_pahmacollectionlist coll ON (coll.id = cc.id)
+LEFT OUTER JOIN collectionobjects_common_fieldcollectionmethods fcmeth ON (fcmeth.id = cc.id)
+LEFT OUTER JOIN collectionobjects_common_fieldcollectionsources fcsrc ON (fcsrc.id = cc.id)
+LEFT OUTER JOIN collectionobjects_common_fieldcollectors fcoll ON (fcoll.id = cc.id)
+LEFT OUTER JOIN hierarchy hcd ON (hcd.parentid = cc.id
+	AND hcd.primarytype = 'structuredDateGroup'
+	AND hcd.name = 'collectionobjects_pahma:pahmaFieldCollectionDateGroupList'
+	AND (hcd.pos = 0 OR hcd.pos IS NULL))
+LEFT OUTER JOIN structureddategroup scd ON (scd.id = hcd.id)
+LEFT OUTER JOIN hierarchy hppr ON (hppr.parentid = cc.id
+	AND hppr.primarytype = 'objectProductionPeopleGroup')
+LEFT OUTER JOIN objectproductionpeoplegroup oppr ON (oppr.id = hppr.id)
+LEFT OUTER JOIN hierarchy hprs ON (hprs.parentid = cc.id
+	AND hprs.primarytype = 'objectProductionPersonGroup')
+LEFT OUTER JOIN objectproductionpersongroup oprs ON (oprs.id = hprs.id)
+LEFT OUTER JOIN hierarchy hporg ON (hporg.parentid = cc.id
+	AND hporg.primarytype = 'objectProductionOrganizationGroup')
+LEFT OUTER JOIN objectproductionorganizationgroup oporg ON (oporg.id = hporg.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmaethnographicfilecodelist efc ON (efc.id = cc.id)
+LEFT OUTER JOIN hierarchy hm ON (hm.parentid = cc.id
+	AND hm.primarytype = 'materialGroup')
+LEFT OUTER JOIN materialgroup mat ON (mat.id = hm.id)
+LEFT OUTER JOIN hierarchy hu ON (hu.parentid = cc.id
+	AND hu.primarytype = 'usageGroup'
+	AND (hu.pos = 0 OR hu.pos IS NULL))
+LEFT OUTER JOIN usagegroup ug ON (ug.id = hu.id)
+LEFT OUTER JOIN hierarchy hc ON (hc.parentid = cc.id
+	AND hc.primarytype = 'assocPeopleGroup')
+LEFT OUTER JOIN assocpeoplegroup apg ON (apg.id = hc.id)
+LEFT OUTER JOIN hierarchy han ON (han.parentid = cc.id
+	AND han.primarytype = 'pahmaAltNumGroup')
+LEFT OUTER JOIN pahmaaltnumgroup ang ON (ang.id = han.id)
+LEFT OUTER JOIN hierarchy hpd ON (hpd.parentid = cc.id
+	AND hpd.primarytype = 'structuredDateGroup'
+	AND hpd.name = 'collectionobjects_common:objectProductionDateGroupList'
+	AND (hpd.pos = 0 OR hpd.pos IS NULL))
+LEFT OUTER JOIN structureddategroup spd ON (spd.id = hpd.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmaobjectstatuslist oslAFIL
+	ON (oslAFIL.id = cc.id
+	AND GETDISPL(oslAFIL.item) IN (
+		'culturally affiliated',
+		'culturally unaffiliated'))
+LEFT OUTER JOIN collectionobjects_pahma_pahmaobjectstatuslist oslDISP
+	ON (oslDISP.id = cc.id
+	AND GETDISPL(oslDISP.item) IN (
+		'deaccessioned',
+		'accessioned',
+		'(unknown)',
+		'partially deaccessioned',
+		'recataloged',
+		'partially recataloged'))
+LEFT OUTER JOIN collectionobjects_pahma_pahmaobjectstatuslist oslMODE ON (oslMODE.id = cc.id
+	AND GETDISPL(oslMODE.item) IN (
+		'intended for repatriation',
+		'pending repatriation',
+		'intended for transfer',
+		'repatriated',
+		'destroyed',
+		'missing',
+		'sold',
+		'stolen',
+		'missing in inventory',
+		'discarded',
+		'exchanged',
+		'partially exchanged',
+		'transferred'))
+LEFT OUTER JOIN (
+	SELECT
+		STRING_AGG(DISTINCT xc.exitnumber,'␥') AS "exitnumber",
+		STRING_AGG(DISTINCT sdg.datedisplaydate,'␥') AS "exitdate",
+		STRING_AGG(DISTINCT GETDISPL(xan.item),'␥') AS "newowner",
+		STRING_AGG(DISTINCT GETDISPL(xc.exitreason),'␥') AS "exitreason",
+		rcx.subjectcsid
+	FROM relations_common rcx
+	JOIN hierarchy hx ON (hx.name = rcx.objectcsid)
+	JOIN objectexit_common xc ON (hx.id = xc.id)
+	JOIN misc mx ON (xc.id = mx.id
+		AND mx.lifecyclestate<>'deleted')
+	LEFT OUTER JOIN hierarchy h3 ON (h3.parentid = xc.id
+		AND h3.name = 'objectexit_common:exitDateGroup')
+	LEFT OUTER JOIN structureddategroup sdg ON (h3.id = sdg.id)
+	LEFT OUTER JOIN objectexit_anthropology_newownerlist xan ON (xan.id = xc.id)
+	WHERE rcx.objectdocumenttype = 'ObjectExit'
+	GROUP BY rcx.subjectcsid
+	) oe ON oe.subjectcsid = h.name
+LEFT OUTER JOIN (
+	SELECT
+		STRING_AGG(DISTINCT ac.acquisitionreferencenumber,'␥') AS "accnumber",
+		STRING_AGG(DISTINCT sad1.datedisplaydate, '␥') AS "accdate",
+		STRING_AGG(DISTINCT sad2.datedisplaydate, '␥') AS "acqdate",
+		STRING_AGG(DISTINCT GETDISPL(adg.donor),'␥') AS "donor",
+		STRING_AGG(DISTINCT GETDISPL(acs.item),'␥') AS "sources",
+		STRING_AGG(DISTINCT GETDISPL(ac.acquisitionmethod),'␥') AS "methods",
+		rcac.subjectcsid
+	FROM relations_common rcac
+	JOIN hierarchy hac ON (rcac.objectcsid = hac.name)
+	JOIN acquisitions_common ac ON (hac.id = ac.id)
+	JOIN misc mac ON (ac.id = mac.id
+		AND mac.lifecyclestate<>'deleted')
+	LEFT OUTER JOIN hierarchy had1 ON (ac.id = had1.parentid
+		AND had1.primarytype = 'structuredDateGroup'
+		AND had1.name = 'acquisitions_common:accessionDateGroup'
+		AND (had1.pos = 0 OR had1.pos IS NULL))
+	LEFT OUTER JOIN structureddategroup sad1 ON (sad1.id = had1.id)
+	LEFT OUTER JOIN hierarchy had2 ON (ac.id = had2.parentid
+		AND had2.primarytype = 'structuredDateGroup'
+		AND had2.name = 'acquisitions_common:acquisitionDateGroupList'
+		AND (had2.pos = 0 OR had2.pos IS NULL))
+	LEFT OUTER JOIN structureddategroup sad2 ON (sad2.id = had2.id)
+	LEFT OUTER JOIN hierarchy h2 ON (ac.id = h2.parentid
+		AND h2.name = 'acquisitions_pahma:acquisitionDonorGroupList')
+	LEFT OUTER JOIN acquisitiondonorgroup adg ON (adg.id = h2.id)
+	LEFT OUTER JOIN acquisitions_common_acquisitionsources acs ON (acs.id = ac.id)
+	WHERE rcac.objectdocumenttype = 'Acquisition'
+	GROUP BY rcac.subjectcsid
+	) acc ON acc.subjectcsid = h.name
+LEFT OUTER JOIN (
+	SELECT
+		STRING_AGG(DISTINCT GETDISPL(oppl.objectproductionplace),'␥') AS "prodplaces",
+		STRING_AGG(DISTINCT utils.placename_hierarchy.place_hierarchy,'␥') AS "prodplacehier",
+		ccppl.id AS "ccid"
+	FROM collectionobjects_common ccppl
+	LEFT OUTER JOIN hierarchy hppl ON (hppl.parentid = ccppl.id
+		AND hppl.primarytype = 'objectProductionPlaceGroup')
+	LEFT OUTER JOIN objectproductionplacegroup oppl ON (oppl.id = hppl.id)
+	LEFT OUTER JOIN places_common pcopp ON (pcopp.shortidentifier = REGEXP_REPLACE(oppl.objectproductionplace, '^.*item:name\((.*?)\)''.*', '\1'))
+	LEFT OUTER JOIN hierarchy pcsidopp ON (pcopp.id = pcsidopp.id)
+	LEFT OUTER JOIN utils.placename_hierarchy ON (pcsidopp.name = utils.placename_hierarchy.placecsid)
+	GROUP BY ccppl.id
+	) prodpl ON prodpl.ccid = cc.id
 WHERE $P!{whereclause}
 AND (oe.exitReason NOT LIKE '%recataloged%' OR oe.exitReason IS NULL)
-GROUP BY cc.id, h.name, fcp.item, ong.objectname, bd.item, cp.pahmatmslegacydepartment, cp.sortableobjectnumber,
-ug.usage, cp.iscomponent, cp.pahmafieldlocverbatim, scd.datedisplaydate, spd.datedisplaydate, placename_hierarchy.place_hierarchy
+GROUP BY
+	cc.id,
+	h.name,
+	fcp.item,
+	bd.item,
+	ocg.objectcount,
+	ong.objectname,
+	cp.pahmatmslegacydepartment,
+	cp.sortableobjectnumber,
+	ug.usage,
+	cp.iscomponent,
+	cp.pahmafieldlocverbatim,
+	scd.datedisplaydate,
+	spd.datedisplaydate,
+	placename_hierarchy.place_hierarchy
 ORDER BY cp.sortableobjectnumber]]>
 	</queryString>
 	<field name="Museum_number" class="java.lang.String"/>

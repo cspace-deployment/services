@@ -5,33 +5,42 @@
 	<property name="ireport.y" value="0"/>
 	<parameter name="groupcsid" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT gc.title AS groupTitle,
-        hco.name AS csid,
-        co.objectnumber AS museumNumber,
-        cp.sortableobjectnumber AS sortableObjectNumber,
-        ong.objectName AS objectName,
-        bd.item AS briefDescription,
-        CASE WHEN (fcp.item IS NOT NULL AND fcp.item <> '')
-          THEN GETDISPL(fcp.item) END AS site,
-        co.numberofobjects AS objectCount,
-        CASE WHEN (apg.assocpeople is not null and apg.assocpeople <> '')
-          THEN GETDISPL(apg.assocpeople)
-        END AS culturalGroup
+		<![CDATA[SELECT 
+	gc.title AS groupTitle,
+	hcc.name AS csid,
+	cc.objectnumber AS museumNumber,
+	cp.sortableobjectnumber AS sortableObjectNumber,
+	ong.objectName AS objectName,
+	bd.item AS briefDescription,
+	GETDISPL(fcp.item) AS site,
+	ocg.objectCount AS objectCount,
+	GETDISPL(apg.assocpeople) AS culturalGroup
 FROM groups_common gc
 JOIN hierarchy hgc ON (gc.id = hgc.id)
-JOIN relations_common rc ON (hgc.name = rc.subjectcsid)
-JOIN hierarchy hco ON (rc.objectcsid = hco.name)
-JOIN collectionobjects_common co ON (hco.id = co.id)
-LEFT OUTER JOIN collectionobjects_pahma cp ON (co.id = cp.id)
-LEFT OUTER JOIN collectionobjects_anthropology ca on (co.id = ca.id)
-LEFT OUTER JOIN hierarchy hong ON (co.id = hong.parentid AND hong.primarytype = 'objectNameGroup' AND hong.pos = 0)
-LEFT OUTER JOIN objectnamegroup ong ON (ong.id = hong.id)
-LEFT OUTER JOIN hierarchy hapg on (co.id = hapg.parentid and hapg.pos = 0 and hapg.name = 'collectionobjects_common:assocPeopleGroupList')
-LEFT OUTER JOIN assocpeoplegroup apg on (apg.id = hapg.id)
-LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id = co.id and bd.pos = 0)
-LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (co.id = fcp.id AND fcp.pos = 0)
-JOIN misc ms ON (co.id = ms.id AND ms.lifecyclestate <> 'deleted')
-WHERE rc.subjectcsid = $P{groupcsid}
+JOIN relations_common rc ON (hgc.name = rc.subjectcsid
+	AND rc.objectdocumenttype = 'CollectionObject')
+JOIN hierarchy hcc ON (rc.objectcsid = hcc.name)
+JOIN collectionobjects_common cc ON (hcc.id = cc.id)
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
+LEFT OUTER JOIN hierarchy hong ON (cc.id = hong.parentid 
+	AND hong.primarytype = 'objectNameGroup' 
+	AND hong.pos = 0)
+LEFT OUTER JOIN objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN hierarchy hapg ON (cc.id = hapg.parentid 
+	AND hapg.primarytype = 'assocPeopleGroup')
+	AND hapg.pos = 0 
+LEFT OUTER JOIN assocpeoplegroup apg ON (hapg.id = apg.id)
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id = cc.id 
+	AND bd.pos = 0)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (cc.id = fcp.id 
+	AND fcp.pos = 0)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid 
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0)
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+JOIN misc m ON (cc.id = m.id 
+	AND m.lifecyclestate <> 'deleted')
+WHERE hgc.name = $P{groupcsid}
 ORDER BY cp.sortableobjectnumber]]>
 	</queryString>
 	<field name="groupTitle" class="java.lang.String"/>

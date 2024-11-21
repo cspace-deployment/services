@@ -10,38 +10,60 @@
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
 	<parameter name="Agency" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[SELECT DISTINCT cc.objectnumber AS objectnumber,
-        cp.sortableobjectnumber AS sortnumber,
-        cc.numberofobjects AS pieces,
-        ong.objectname AS objectname,
-        fcd.datedisplaydate AS collectiondate,
-        STRING_AGG(DISTINCT(ac.acquisitionreferencenumber), ', ') AS accno,
-        getdispl(fcp.item) AS site,
-        getdispl(pog.anthropologyplaceowner) AS siteowner,
-        pog.anthropologyplaceownershipnote AS ownershipnote,
-        pc.placenote AS placenote
+		<![CDATA[SELECT DISTINCT
+	cc.objectnumber AS objectnumber,
+	cp.sortableobjectnumber AS sortnumber,
+	ocg.objectCount AS pieces,
+	ong.objectname AS objectname,
+	fcd.datedisplaydate AS collectiondate,
+	STRING_AGG(DISTINCT(ac.acquisitionreferencenumber), ', ') AS accno,
+	getdispl(fcp.item) AS site,
+	getdispl(pog.anthropologyplaceowner) AS siteowner,
+	pog.anthropologyplaceownershipnote AS ownershipnote,
+	pc.placenote AS placenote
 FROM collectionobjects_common cc
 LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
-LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (fcp.id = cc.id)
-JOIN misc ms ON (ms.id = cc.id AND ms.lifecyclestate <> 'deleted')
-JOIN places_common pc ON (pc.refname = fcp.item)
-JOIN hierarchy hpog ON (hpog.parentid = pc.id AND hpog.primarytype = 'anthropologyPlaceOwnerGroup')
-JOIN anthropologyPlaceOwnerGroup pog ON (pog.id = hpog.id)
-FULL OUTER JOIN hierarchy hong ON (hong.parentid = cc.id
-        AND hong.name = 'collectionobjects_common:objectNameList' AND hong.pos = 0)
-FULL OUTER JOIN objectnamegroup ong ON (ong.id = hong.id)
-FULL OUTER JOIN hierarchy hcc ON (hcc.id = cc.id)
-FULL OUTER JOIN relations_common rc ON (rc.subjectcsid = hcc.name AND rc.objectdocumenttype = 'Acquisition')
-FULL OUTER JOIN hierarchy hac ON (hac.name = rc.objectcsid)
-FULL OUTER JOIN acquisitions_common ac ON (ac.id = hac.id)
-FULL OUTER JOIN hierarchy hfcd ON (hfcd.parentid = cc.id 
-        AND hfcd.name = 'collectionobjects_pahma:pahmaFieldCollectionDateGroupList' AND hfcd.pos = 0)
-FULL OUTER JOIN structureddategroup fcd ON (fcd.id = hfcd.id)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid 
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0 )
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+LEFT OUTER JOIN hierarchy hong ON (hong.parentid = cc.id 
+	AND hong.primarytype = 'objectNameGroup' 
+	AND hong.pos = 0)
+LEFT OUTER JOIN objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN hierarchy hfcd ON (hfcd.parentid = cc.id 
+	AND hfcd.name = 'collectionobjects_pahma:pahmaFieldCollectionDateGroupList' 
+	AND hfcd.pos = 0)
+LEFT OUTER JOIN structureddategroup fcd ON (fcd.id = hfcd.id)
+LEFT OUTER JOIN hierarchy hcc ON (hcc.id = cc.id)
+LEFT OUTER JOIN relations_common rc ON (hcc.name = rc.subjectcsid
+	AND rc.objectdocumenttype = 'Acquisition')
+LEFT OUTER JOIN hierarchy hac ON (rc.objectcsid = hac.name)
+LEFT OUTER JOIN acquisitions_common ac ON (hac.id = ac.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (cc.id = fcp.id)
+JOIN places_common pc ON (fcp.item = pc.refname)
+JOIN hierarchy hpog ON (pc.id = hpog.parentid
+	AND hpog.primarytype = 'anthropologyPlaceOwnerGroup')
+JOIN anthropologyPlaceOwnerGroup pog ON (hpog.id = pog.id)
+JOIN misc m ON (m.id = cc.id 
+	AND m.lifecyclestate <> 'deleted')
 WHERE pog.anthropologyplaceowner = $P{Agency}
-OR (pog.anthropologyplaceowner IS NULL AND pog.anthropologyplaceownershipnote ~ getdispl($P{Agency}))
-GROUP BY cc.objectnumber, cp.sortableobjectnumber, cc.numberofobjects, ong.objectname, fcd.datedisplaydate,
-        fcp.item, pog.anthropologyplaceowner, pog.anthropologyplaceownershipnote, pc.placenote
-ORDER BY getdispl(fcp.item), pog.anthropologyplaceownershipnote, cp.sortableobjectnumber]]>
+	OR (pog.anthropologyplaceowner IS NULL 
+		AND pog.anthropologyplaceownershipnote ~ getdispl($P{Agency}))
+GROUP BY 
+	cc.objectnumber, 
+	cp.sortableobjectnumber, 
+	ocg.objectcount, 
+	ong.objectname, 
+	fcd.datedisplaydate,
+	fcp.item, 
+	pog.anthropologyplaceowner, 
+	pog.anthropologyplaceownershipnote, 
+	pc.placenote
+ORDER BY 
+	getdispl(fcp.item), 
+	pog.anthropologyplaceownershipnote, 
+	cp.sortableobjectnumber]]>
 	</queryString>
 	<field name="objectnumber" class="java.lang.String"/>
 	<field name="sortnumber" class="java.lang.String"/>

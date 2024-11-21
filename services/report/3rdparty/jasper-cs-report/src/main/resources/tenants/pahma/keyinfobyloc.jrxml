@@ -8,49 +8,51 @@
 	<style name="Column header" forecolor="#666666" fontName="SansSerif" fontSize="12" isBold="true"/>
 	<style name="Location Header" fontName="SansSerif" fontSize="12"/>
 	<style name="Detail" fontName="SansSerif" fontSize="12"/>
-        <parameter name="Start Location" class="java.lang.String"/>
-        <parameter name="End Location" class="java.lang.String"/>
-        <parameter name="startLocDispl" class="java.lang.String">
-                <defaultValueExpression><![CDATA[$P{Start Location}.replaceAll("^.*\\)'(.*)'$", "$1")]]></defaultValueExpression>
-        </parameter>
-        <parameter name="endLocDispl" class="java.lang.String">
-                <defaultValueExpression><![CDATA[$P{End Location}.replaceAll("^.*\\)'(.*)'$", "$1")]]></defaultValueExpression>
-        </parameter>
+	<parameter name="Start Location" class="java.lang.String"/>
+	<parameter name="End Location" class="java.lang.String"/>
+	<parameter name="startLocDispl" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{Start Location}.replaceAll("^.*\\)'(.*)'$", "$1")]]></defaultValueExpression>
+	</parameter>
+	<parameter name="endLocDispl" class="java.lang.String">
+		<defaultValueExpression><![CDATA[$P{End Location}.replaceAll("^.*\\)'(.*)'$", "$1")]]></defaultValueExpression>
+	</parameter>
 	<queryString>
 		<![CDATA[SELECT
-  CASE WHEN ca.computedcrate IS NULL
-    THEN GETDISPL(c.computedcurrentlocation)
-    ELSE GETDISPL(c.computedcurrentlocation) || ' ' || GETDISPL(ca.computedcrate)
-  END AS storageLocation,
-  CASE WHEN ca.computedcrate IS NULL THEN REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0')
-    ELSE REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0') || '0' || REPLACE(GETDISPL(ca.computedcrate), ' ', '0')
-  END AS locationKey,
-  c.objectnumber AS objectNumber,
-  cp.sortableobjectnumber AS sortableObjectNumber,
-  c.numberofobjects AS objectCount,
-  ong.objectName AS objectName,
-  CASE WHEN (pfc.item IS NOT NULL AND pfc.item <> '')
-    THEN GETDISPL(pfc.item)
-  END AS fieldCollectionPlace,
-  CASE WHEN (apg.assocpeople is not null and apg.assocpeople <> '')
-    THEN GETDISPL(apg.assocpeople)
-  END AS culturalGroup,
-  CASE WHEN (pef.item IS NOT NULL AND pef.item <> '') THEN
-    GETDISPL(pef.item)
-  END AS ethnographicFileCode
-FROM collectionobjects_common c
-LEFT OUTER JOIN collectionobjects_pahma cp ON (c.id = cp.id)
-LEFT OUTER JOIN collectionobjects_anthropology ca ON (c.id = ca.id)
-LEFT OUTER JOIN hierarchy h5 ON (c.id = h5.parentid AND h5.pos = 0 AND h5.name = 'collectionobjects_common:objectNameList')
-LEFT OUTER JOIN objectnamegroup ong ON (ong.id = h5.id)
-LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist pfc ON (pfc.id = c.id AND pfc.pos = 0)
-LEFT OUTER JOIN hierarchy h3 ON (c.id = h3.parentid AND h3.pos = 0 AND h3.name = 'collectionobjects_common:assocPeopleGroupList')
-LEFT OUTER JOIN assocpeoplegroup apg ON (apg.id = h3.id)
-LEFT OUTER JOIN collectionobjects_pahma_pahmaethnographicfilecodelist pef ON (pef.id = c.id AND pef.pos = 0)
-JOIN misc ms ON (c.id = ms.id AND ms.lifecyclestate <> 'deleted')
-WHERE REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0') >= REPLACE($P{startLocDispl}, ' ', '0')
-  AND REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0') <= REPLACE($P{endLocDispl}, ' ', '0')
-ORDER BY locationKey, sortableObjectNumber, objectName desc]]>
+	COALESCE(GETDISPL(cc.computedcurrentlocation) || ' ' || GETDISPL(ca.computedcrate),
+		GETDISPL(cc.computedcurrentlocation)) AS storageLocation,
+	COALESCE(REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0') || '0'|| REPLACE(GETDISPL(ca.computedcrate), ' ', '0'),
+		REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0')) AS locationKey,
+	cc.objectnumber AS objectNumber,
+	cp.sortableobjectnumber AS sortableObjectNumber,
+	ocg.objectCount AS objectCount,
+	ong.objectName AS objectName,
+	GETDISPL(pfc.item) AS fieldCollectionPlace,
+	GETDISPL(apg.assocpeople) AS culturalGroup,
+	GETDISPL(pef.item) AS ethnographicFileCode
+FROM collectionobjects_common cc
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
+LEFT OUTER JOIN collectionobjects_anthropology ca ON (cc.id = ca.id)
+LEFT OUTER JOIN hierarchy hong ON (cc.id = hong.parentid
+	AND hong.primarytype = 'objectNameGroup'
+	AND hong.pos = 0)
+LEFT OUTER JOIN objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist pfc ON (pfc.id = cc.id
+	AND pfc.pos = 0)
+LEFT OUTER JOIN hierarchy hapg ON (cc.id = hapg.parentid
+	AND hapg.primarytype = 'assocPeopleGroup'
+	AND hapg.pos = 0)
+LEFT OUTER JOIN assocpeoplegroup apg ON (hapg.id = apg.id)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid
+	AND hocg.primarytype = 'objectCountGroup')
+	AND hocg.pos = 0
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmaethnographicfilecodelist pef ON (pef.id = cc.id
+	AND pef.pos = 0)
+JOIN misc m ON (cc.id = m.id
+	AND m.lifecyclestate <> 'deleted')
+WHERE REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0') >= REPLACE($P{startLocDispl}, ' ', '0')
+	AND REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0') <= REPLACE($P{endLocDispl}, ' ', '0')
+ORDER BY locationKey, sortableObjectNumber, objectName DESC]]>
 	</queryString>
 	<field name="storageLocation" class="java.lang.String"/>
 	<field name="locationKey" class="java.lang.String"/>

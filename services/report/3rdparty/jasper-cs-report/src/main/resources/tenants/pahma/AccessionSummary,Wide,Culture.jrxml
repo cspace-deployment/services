@@ -7,41 +7,44 @@
 		<defaultValueExpression><![CDATA["0cca1640-6014-4b3e-8453"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT  ac.acquisitionreferencenumber accessionNumber,
-        aa.acquisitionDescription,
-        h1.name AS "csid",
-        co.objectnumber AS "Museum No.",
-        cp.sortableobjectnumber AS "sort",
-        ong.objectName AS "Name",
-        bd.item AS "Description",
-        CASE WHEN (fcp.item IS NOT NULL AND fcp.item <> '')
-          THEN regexp_replace(fcp.item, '^.*\)''(.*)''$', '\1') END AS "Site",
-        co.numberofobjects objectCount,
-        case when (apg.assocpeople is not null and apg.assocpeople <> '') then
-          regexp_replace(apg.assocpeople, '^.*\)''(.*)''$', '\1')
-        end as culturalgroup
+		<![CDATA[SELECT
+	ac.acquisitionreferencenumber AS accessionnumber,
+	aa.acquisitionDescription,
+	hac.name AS csid,
+	cc.objectnumber AS "Museum No.",
+	cp.sortableobjectnumber AS "sort",
+	ong.objectName AS "Name",
+	bd.item AS "Description",
+	GETDISPL(fcp.item) AS "Site",
+	ocg.objectCount AS objectcount,
+	GETDISPL(apg.assocpeople) AS culturalgroup
 FROM acquisitions_common ac
-JOIN hierarchy h1 ON (ac.id=h1.id)
-JOIN relations_common rc1 ON (h1.name=rc1.subjectcsid)
-JOIN hierarchy h2 ON (rc1.objectcsid=h2.name)
-JOIN collectionobjects_common co ON (h2.id=co.id)
-LEFT OUTER JOIN collectionobjects_pahma cp ON (co.id=cp.id)
-LEFT OUTER JOIN collectionobjects_anthropology ca on (co.id=ca.id)
-LEFT OUTER JOIN acquisitions_anthropology aa on (ac.id=aa.id)
-
-LEFT OUTER JOIN hierarchy h3 ON (co.id = h3.parentid AND h3.primarytype='objectNameGroup' AND h3.pos=0)
-LEFT OUTER JOIN objectnamegroup ong ON (ong.id=h3.id)
-
-left outer join hierarchy h4 on (co.id=h4.parentid and h4.pos=0 and h4.name='collectionobjects_common:assocPeopleGroupList')
-left outer join assocpeoplegroup apg on (apg.id=h4.id)
-
-LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (bd.id=co.id and bd.pos=0)
-
-LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (co.id=fcp.id AND fcp.pos=0)
-
-JOIN misc ms ON (co.id=ms.id AND ms.lifecyclestate <> 'deleted')
-WHERE rc1.subjectcsid =$P{csid}
-
+JOIN hierarchy hac ON (ac.id = hac.id)
+JOIN relations_common rc ON (hac.name = rc.subjectcsid
+	AND rc.objectdocumenttype = 'CollectionObject')
+JOIN hierarchy hcc ON (rc.objectcsid = hcc.name)
+JOIN collectionobjects_common cc ON (hcc.id = cc.id)
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
+LEFT OUTER JOIN acquisitions_anthropology aa ON (ac.id = aa.id)
+LEFT OUTER JOIN hierarchy hong ON (cc.id = hong.parentid
+	AND hong.primarytype = 'objectNameGroup'
+	AND hong.pos = 0)
+LEFT OUTER JOIN objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN hierarchy hapg ON (cc.id = hapg.parentid
+	AND hapg.primarytype = 'assocPeopleGroup')
+	AND hapg.pos = 0
+LEFT OUTER JOIN assocpeoplegroup apg ON (apg.id = hapg.id)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0)
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (cc.id = bd.id
+	AND bd.pos = 0)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist fcp ON (cc.id = fcp.id
+	AND fcp.pos = 0)
+JOIN misc m ON (cc.id = m.id
+	AND m.lifecyclestate <> 'deleted')
+WHERE hac.name = $P{csid}
 ORDER BY cp.sortableobjectnumber]]>
 	</queryString>
 	<field name="accessionnumber" class="java.lang.String"/>

@@ -15,64 +15,44 @@
 		<defaultValueExpression><![CDATA["35aee97c-c238-45f6-a077"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[select
-g.title groupTitle,
-(case when g.scopenote is Null then '' else g.scopenote end) scopeNote,
-co1.id objectid,
-co1.objectnumber objectNumber,
-co1.objectnumber componentNumber,
-co1.numberofobjects objectCount,
-findcurrentlocation(co1.id) location1,
-findcurrentlocation(co1.id) location2,
-findcurrentlocation(co1.id) currLocation,
-'geography' Geography,
-'culture' Culture,
-'filecode' FileCode,
-(case when ong.objectName is NULL then '' else ong.objectName end) objectName,
-(case when ong.objectName is NULL then '' else ong.objectName end) componentName,
-sd.datedisplaydate fieldCollectionDate,
-(case when bd.item is NULL then '' else bd.item end) description,
-r.subjectcsid relationsubjectid,
-r.objectcsid,
-h4.id h4id,
-h4.parentid h4pid,
-h3.id h3id,
-h3.parentid h3pid,
-misc.lifecyclestate lifecyclestate
-from groups_common g
-left outer join hierarchy h1 on (g.id = h1.id)
-inner join relations_common r on (h1.name = r.objectcsid)
-left outer join hierarchy h2 on (r.subjectcsid = h2.name)
-left outer join collectionobjects_common co1 on (h2.id = co1.id)
-left outer join collectionobjects_common_briefdescriptions bd on (co1.id = bd.id AND bd.pos = 0)
-inner join misc on misc.id = co1.id
-inner join hierarchy h3 on (h3.name = r.subjectcsid)
-inner join hierarchy h4 on (h3.id = h4.parentid)
-inner join structureddategroup sd on (h4.id = sd.id)
-inner join collectionspace_core core on core.id=co1.id
-left outer join hierarchy h5 on (co1.id = h5.parentid)
-inner join objectnamegroup ong on (ong.id=h5.id)
-where misc.lifecyclestate <> 'deleted'
-and h4.name = 'collectionobjects_pahma:pahmaFieldCollectionDateGroupList'
-and core.tenantid=$P{tenantid}
-and h1.name=$P{csid}
-order by objectnumber]]>
+		<![CDATA[SELECT
+	cc.objectnumber AS objectNumber,
+	ocg.objectCount AS objectCount,
+	GETDISPL(cc.computedcurrentlocation) AS location1,
+	GETDISPL(cc.computedcurrentlocation) AS location2,
+	GETDISPL(cc.computedcurrentlocation) AS currLocation,
+	'geography' AS Geography,
+	'culture' AS Culture,
+	'filecode' AS FileCode,
+	COALESCE(ong.objectName, '') AS objectName
+FROM groups_common gc
+LEFT OUTER JOIN hierarchy hgc ON (gc.id = hgc.id)
+JOIN relations_common rc ON (hgc.name = rc.subjectcsid
+	AND rc.objectdocumenttype = 'CollectionObject')
+LEFT OUTER JOIN hierarchy hcc ON (rc.objectcsid = hcc.name)
+LEFT OUTER JOIN collectionobjects_common cc ON (hcc.id = cc.id)
+LEFT OUTER JOIN hierarchy hong ON (cc.id = hong.parentid
+	AND hong.primarytype = 'objectNameGroup'
+	and hong.pos = 0)
+inner join objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0)
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+JOIN misc m ON (cc.id = m.id
+	AND m.lifecyclestate <> 'deleted')
+WHERE hgc.name = $P{csid}
+ORDER BY cc.objectnumber]]>
 	</queryString>
 	<field name="objectNumber" class="java.lang.String"/>
-	<field name="objectName" class="java.lang.String"/>
-	<field name="groupTitle" class="java.lang.String"/>
-	<field name="scopeNote" class="java.lang.String"/>
-	<field name="currLocation" class="java.lang.String"/>
-	<field name="componentNumber" class="java.lang.String"/>
-	<field name="componentName" class="java.lang.String"/>
 	<field name="objectCount" class="java.lang.Integer"/>
-	<field name="fieldcollectiondate" class="java.lang.String"/>
-	<field name="description" class="java.lang.String"/>
 	<field name="location1" class="java.lang.String"/>
 	<field name="location2" class="java.lang.String"/>
+	<field name="currLocation" class="java.lang.String"/>
 	<field name="Geography" class="java.lang.String"/>
 	<field name="Culture" class="java.lang.String"/>
 	<field name="FileCode" class="java.lang.String"/>
+	<field name="objectName" class="java.lang.String"/>
 	<group name="currLocation">
 		<groupExpression><![CDATA[$F{currLocation}]]></groupExpression>
 		<groupHeader>

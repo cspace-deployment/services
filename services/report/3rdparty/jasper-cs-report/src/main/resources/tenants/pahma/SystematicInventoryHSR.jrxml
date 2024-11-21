@@ -21,30 +21,34 @@
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT
-  CASE WHEN ca.computedcrate IS NULL
-    THEN GETDISPL(c.computedcurrentlocation)
-    ELSE GETDISPL(c.computedcurrentlocation) || ': ' || GETDISPL(ca.computedcrate)
-  END AS storageLocation,
-  CASE WHEN ca.computedcrate is null
-    THEN REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0')
-    ELSE REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0') || '0' || REPLACE(GETDISPL(ca.computedcrate), ' ', '0')
-  END AS locationKey,
-  GETDISPL(ca.computedcrate) AS computedCrate,
-  c.objectnumber AS objectNumber,
-  cp.sortableobjectnumber AS sortableObjectNumber,
-  c.numberofobjects AS objectCount,
-  ong.objectName AS objectName,
-  bd.item AS briefDescription,
-  cp.inventorycount AS countNote
-FROM collectionobjects_common c
-LEFT OUTER JOIN hierarchy h1 ON (c.id = h1.parentid AND h1.pos = 0 AND h1.name = 'collectionobjects_common:objectNameList')
-LEFT OUTER JOIN objectnamegroup ong ON (ong.id = h1.id)
-LEFT OUTER JOIN collectionobjects_pahma cp ON (c.id = cp.id)
-LEFT OUTER JOIN collectionobjects_anthropology ca ON (c.id = ca.id)
-JOIN misc ms ON (c.id = ms.id AND ms.lifecyclestate <> 'deleted')
-FULL OUTER JOIN collectionobjects_common_briefdescriptions bd ON bd.id = c.id AND bd.pos = 0
-WHERE REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0') >= REPLACE($P{startLocDispl}, ' ', '0')
-  AND REPLACE(GETDISPL(c.computedcurrentlocation), ' ', '0') <= REPLACE($P{endLocDispl}, ' ', '0')
+	COALESCE(GETDISPL(cc.computedcurrentlocation) || ': ' || GETDISPL(ca.computedcrate),
+		GETDISPL(cc.computedcurrentlocation)) AS storageLocation,
+	COALESCE(REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0') || '0'|| REPLACE(GETDISPL(ca.computedcrate), ' ', '0'),
+		REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0')) AS locationKey,
+	GETDISPL(ca.computedcrate) AS computedCrate,
+	cc.objectnumber AS objectNumber,
+	cp.sortableobjectnumber AS sortableObjectNumber,
+	ocg.objectCount AS objectCount,
+	ong.objectName AS objectName,
+	bd.item AS briefDescription,
+	ocg.objectCountNote AS countNote
+FROM collectionobjects_common cc
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
+LEFT OUTER JOIN collectionobjects_anthropology ca ON (cc.id = ca.id)
+LEFT OUTER JOIN hierarchy hong ON (cc.id = hong.parentid
+	AND hong.primarytype = 'objectNameGroup'
+	AND hong.pos = 0)
+LEFT OUTER JOIN objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0)
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+FULL OUTER JOIN collectionobjects_common_briefdescriptions bd ON bd.id = cc.id
+	AND bd.pos = 0
+JOIN misc m ON (cc.id = m.id
+	AND m.lifecyclestate <> 'deleted')
+WHERE REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0') >= REPLACE($P{startLocDispl}, ' ', '0')
+AND REPLACE(GETDISPL(cc.computedcurrentlocation), ' ', '0') <= REPLACE($P{endLocDispl}, ' ', '0')
 ORDER BY locationKey, sortableObjectNumber, objectName desc]]>
 	</queryString>
 	<field name="storageLocation" class="java.lang.String"/>

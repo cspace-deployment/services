@@ -15,58 +15,47 @@
 		<defaultValueExpression><![CDATA["b6d49fa9-788a-477a-993e"]]></defaultValueExpression>
 	</parameter>
 	<queryString language="SQL">
-		<![CDATA[select
-findcurrentlocation(co1.id) currLocation,
-co1.numberofobjects objectCount,
-ptg.termname as site,
-substring(pcoc.item, position(')''' in pcoc.item)+2, length(pcoc.item)-position(')''' in pcoc.item)-2) as fieldcollectionplace,
-g.title groupTitle,
-(case when g.scopenote is Null then '' else g.scopenote end) scopeNote,
-co1.id objectid,
-co1.objectnumber objectNumber,
-cop.sortableobjectnumber,
-(case when ong.objectName is NULL then '' else ong.objectName end) objectName,
-sd.datedisplaydate fieldCollectionDate,
-(case when bd.item is NULL then '' else bd.item end) description,
-r.subjectcsid relationsubjectid,
-r.objectcsid,
-h4.id h4id,
-h4.parentid h4pid,
-h3.id h3id,
-h3.parentid h3pid,
-misc.lifecyclestate lifecyclestate
-from groups_common g
-left outer join hierarchy h1 on (g.id = h1.id)
-inner join relations_common r on (h1.name = r.objectcsid)
-left outer join hierarchy h2 on (r.subjectcsid = h2.name)
-left outer join collectionobjects_common co1 on (h2.id = co1.id)
-left outer join collectionobjects_pahma cop on (h2.id = cop.id)
-left outer join collectionobjects_common_briefdescriptions bd on (co1.id = bd.id AND bd.pos = 0)
-inner join misc on misc.id = co1.id
-inner join hierarchy h3 on (h3.name = r.subjectcsid)
-inner join hierarchy h4 on (h3.id = h4.parentid)
-inner join structureddategroup sd on (h4.id = sd.id)
-inner join collectionspace_core core on core.id=co1.id
-left outer join hierarchy h5 on (co1.id = h5.parentid)
-inner join objectnamegroup ong on (ong.id=h5.id)
-
-left outer join collectionobjects_pahma_pahmafieldcollectionplacelist pcoc on co1.id = pcoc.id
-left outer join places_common pc on pc.refname = pcoc.item
-left outer join hierarchy h6 on pc.id = h6.parentid
-join placetermgroup ptg on ptg.id = h6.id
-
-where misc.lifecyclestate <> 'deleted'
-and h4.name = 'collectionobjects_pahma:pahmaFieldCollectionDateGroupList'
-and core.tenantid=$P{tenantid}
-and h1.name= $P{csid}
-order by ptg.termname,cop.sortableobjectnumber]]>
+		<![CDATA[SELECT
+	GETDISPL(cc.computedcurrentlocation) AS currLocation,
+	cc.objectnumber AS objectNumber,
+	COALESCE(ong.objectName, '') AS objectName,
+	ocg.objectCount AS objectCount,
+	GETDISPL(pcoc.item) AS fieldcollectionplace,
+	COALESCE(bd.item, '') AS description,
+	COALESCE(gc.scopenote, '') AS scopeNote,
+	cp.sortableobjectnumber
+FROM groups_common gc
+JOIN hierarchy hgc ON (gc.id = hgc.id)
+JOIN relations_common rc ON (hgc.name = rc.subjectcsid
+	AND rc.objectdocumenttype = 'CollectionObject')
+LEFT OUTER JOIN hierarchy hcc ON (rc.objectcsid = hcc.name)
+LEFT OUTER JOIN collectionobjects_common cc ON (hcc.id = cc.id)
+LEFT OUTER JOIN collectionobjects_pahma cp ON (cc.id = cp.id)
+LEFT OUTER JOIN hierarchy hong ON (cc.id = hong.parentid
+	AND hong.primarytype = 'objectNameGroup'
+	AND hong.pos = 0)
+JOIN objectnamegroup ong ON (hong.id = ong.id)
+LEFT OUTER JOIN hierarchy hocg ON (cc.id = hocg.parentid
+	AND hocg.primarytype = 'objectCountGroup'
+	AND hocg.pos = 0)
+LEFT OUTER JOIN objectcountgroup ocg ON (hocg.id = ocg.id)
+LEFT OUTER JOIN collectionobjects_pahma_pahmafieldcollectionplacelist pcoc ON (cc.id = pcoc.id)
+LEFT OUTER JOIN places_common pc ON (pcoc.item = pc.refname)
+LEFT OUTER JOIN hierarchy hptg ON (pc.id = hptg.parentid
+	AND hptg.primarytype = 'placeTermGroup')
+JOIN placetermgroup ptg ON (ptg.id = hptg.id)
+LEFT OUTER JOIN collectionobjects_common_briefdescriptions bd ON (cc.id = bd.id
+	AND bd.pos = 0)
+JOIN misc m ON (m.id = cc.id
+	AND m.lifecyclestate <> 'deleted')
+WHERE hgc.name = $P{csid}
+ORDER BY ptg.termname, cp.sortableobjectnumber]]>
 	</queryString>
+	<field name="currLocation" class="java.lang.String"/>
 	<field name="objectNumber" class="java.lang.String"/>
 	<field name="objectName" class="java.lang.String"/>
-	<field name="currLocation" class="java.lang.String"/>
 	<field name="objectCount" class="java.lang.Integer"/>
 	<field name="fieldcollectionplace" class="java.lang.String"/>
-	<field name="site" class="java.lang.String"/>
 	<field name="description" class="java.lang.String"/>
 	<field name="scopeNote" class="java.lang.String"/>
 	<group name="objectNumber">
