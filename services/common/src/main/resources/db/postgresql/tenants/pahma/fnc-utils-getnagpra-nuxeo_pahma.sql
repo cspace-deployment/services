@@ -44,7 +44,7 @@ BEGIN
     CREATE TEMP TABLE getnagpra_temp (
         cocsid varchar,
         coid varchar,
-        pos varchar,
+        pos integer,
         objectNumber varchar,
         sortableObjectNumber varchar,
         objectStatus varchar,

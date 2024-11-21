@@ -7,7 +7,7 @@
 CREATE TYPE nagpratype AS (
     cocsid varchar,
     coid varchar,
-    pos varchar,
+    pos integer,
     objectNumber varchar,
     sortableObjectNumber varchar,
     objectStatus varchar,
