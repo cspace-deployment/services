@@ -1,8 +1,11 @@
-CREATE OR REPLACE FUNCTION public.findvoucherlabels()
- RETURNS SETOF voucherlabeltype
- LANGUAGE plpgsql
- IMMUTABLE STRICT
-AS $function$
+--
+-- Name: findvoucherlabels(); Type: FUNCTION; Schema: public; Owner: nuxeo_botgarden
+-- Dependency: voucherlabeltype; Type: TYPE; Schema: public; Owner: nuxeo_botgarden
+--
+
+CREATE OR REPLACE FUNCTION public.findvoucherlabels() RETURNS SETOF public.voucherlabeltype
+    LANGUAGE plpgsql IMMUTABLE STRICT
+    AS $_$
       DECLARE
           sheetcount integer;
           r voucherlabeltype%rowtype;
@@ -98,4 +101,8 @@ AS $function$
       
       RETURN;
       END; 
-      $function$
+      $_$;
+
+
+ALTER FUNCTION public.findvoucherlabels() OWNER TO nuxeo_botgarden;
+
